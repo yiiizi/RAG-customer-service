@@ -1,0 +1,69 @@
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import { Button, message } from 'antd';
+import { CopyOutlined } from '@ant-design/icons';
+import { copyText } from '@/utils/markdown';
+
+interface Props {
+  content: string;
+}
+
+export default function MarkdownViewer({ content }: Props) {
+  const handleCopy = (text: string) => {
+    copyText(text);
+    message.success('已复制');
+  };
+
+  return (
+    <div className="markdown-body">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeHighlight]}
+        components={{
+          pre: ({ children, ...props }) => (
+            <div style={{ position: 'relative' }}>
+              <pre {...props}>{children}</pre>
+              <Button
+                type="text"
+                size="small"
+                icon={<CopyOutlined />}
+                style={{ position: 'absolute', top: 4, right: 4, color: '#999' }}
+                onClick={() => {
+                  const text = extractText(children);
+                  handleCopy(text);
+                }}
+              />
+            </div>
+          ),
+          code: ({ className, children, ...props }) => {
+            const isInline = !className;
+            if (isInline) {
+              return (
+                <code style={{ background: 'var(--bg-hover)', padding: '2px 6px', borderRadius: 4 }} {...props}>
+                  {children}
+                </code>
+              );
+            }
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+}
+
+function extractText(children: React.ReactNode): string {
+  if (typeof children === 'string') return children;
+  if (Array.isArray(children)) return children.map(extractText).join('');
+  if (children && typeof children === 'object' && 'props' in children) {
+    return extractText((children as React.ReactElement).props.children);
+  }
+  return '';
+}

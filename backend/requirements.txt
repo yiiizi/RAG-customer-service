@@ -1,0 +1,50 @@
+# ========== RAG Core Framework ==========
+llama-index==0.11.*
+llama-index-vector-stores-milvus
+llama-index-embeddings-huggingface
+
+# ========== Embedding & Reranking ==========
+FlagEmbedding
+torch>=2.0
+
+# ========== API Layer ==========
+fastapi[standard]>=0.110
+uvicorn[standard]
+
+# ========== Vector Database ==========
+pymilvus>=2.4
+
+# ========== Relational Database + Cache ==========
+sqlalchemy[asyncio]>=2.0
+aiomysql
+asyncmy
+redis[hiredis]>=5.0
+
+# ========== BM25 ==========
+rank-bm25
+
+# ========== Document Parsing ==========
+pymupdf
+pdfplumber
+python-docx
+openpyxl
+python-pptx
+ebooklib
+beautifulsoup4
+lxml
+mistune
+pandas
+Pillow
+paddleocr
+paddlepaddle
+
+# ========== Utilities ==========
+pydantic>=2.0
+pydantic-settings
+python-dotenv
+httpx
+tenacity
+tiktoken
+loguru
+aiofiles
+python-multipart

@@ -1,0 +1,67 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.so
+
+# ── Virtual environments ──
+venv/
+.venv/
+env/
+.env
+
+# ── IDE ──
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Jupyter ──
+.ipynb_checkpoints/
+
+# ── Dependencies ──
+node_modules/
+
+# ── Build output ──
+frontend/dist/
+
+# ── Data ──
+backend/data/uploads/*
+
+# ── Models (large files) ──
+*.pth
+*.bin
+*.safetensors
+*.onnx
+
+# ── Logs ──
+*.log
+logs/
+/tmp/
+
+# ── Debug/Test ──
+backend/debug_*.txt
+backend/test_*.py
+backend/test_*.txt
+backend/ws_test*.txt
+backend/api_results.txt
+backend/redis_test.txt
+
+# ── Docker ──
+docker-compose.override.yml
+
+# ── Test ──
+.pytest_cache/
+.coverage
+htmlcov/
