@@ -7,6 +7,7 @@ export interface DashboardStats {
   total_queries: number;
   avg_latency_ms: number;
   hit_rate: number;
+  range: 'today' | '7d' | '30d';
   intent_distribution: Record<string, number>;
   daily_trend: DailyTrendItem[];
   top_faqs: Array<{
@@ -21,6 +22,18 @@ export interface DashboardStats {
     collection_name: string;
     dimension: number;
   };
+  helpful_rate: number;
+  unhelpful_rate: number;
+  unresolved_count: number;
+  handoff_rate: number;
+  ticket_resolution_rate: number;
+  faq_conversion_count: number;
+  top_unresolved: Array<{
+    id: number;
+    question: string;
+    frequency: number;
+    status: string;
+  }>;
 }
 
 export interface SettingsData {

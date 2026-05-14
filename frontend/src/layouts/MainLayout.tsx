@@ -1,43 +1,52 @@
 import { useState, useDeferredValue, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Input, List, Modal } from 'antd';
 import {
   MessageOutlined,
-  DatabaseOutlined,
-  QuestionCircleOutlined,
-  DashboardOutlined,
   SettingOutlined,
   ThunderboltOutlined,
   HistoryOutlined,
   FileTextOutlined,
   PlusOutlined,
   DeleteOutlined,
+  LogoutOutlined,
+  CustomerServiceOutlined,
+  BulbOutlined,
 } from '@ant-design/icons';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useChatStore } from '@/stores/useChatStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import dayjs from 'dayjs';
 import SourcePanel from '@/pages/Chat/SourcePanel';
-import KnowledgeBasePage from '@/pages/KnowledgeBase';
-import FAQPage from '@/pages/FAQ';
-import DashboardPage from '@/pages/Dashboard';
 import SettingsPage from '@/pages/Settings';
 
-type ModalKey = 'knowledge' | 'faq' | 'dashboard' | 'settings' | null;
+type ModalKey = 'settings' | null;
 
 const modalConfig: Record<NonNullable<ModalKey>, { title: string; width: number }> = {
-  knowledge: { title: '知识库管理', width: 900 },
-  faq: { title: 'FAQ 高频问答管理', width: 900 },
-  dashboard: { title: '数据大盘', width: 1100 },
-  settings: { title: '系统设置', width: 720 },
+  settings: { title: '系统设置', width: 1100 },
 };
+
+/** Get initials + gradient color for a conversation avatar */
+function getConvAvatar(title: string) {
+  const first = (title || 'N')[0].toUpperCase();
+  const colors = [
+    'linear-gradient(135deg, #6C63FF, #8B7FFF)',
+    'linear-gradient(135deg, #FF6584, #FF8FA3)',
+    'linear-gradient(135deg, #4ADE80, #86EFAC)',
+    'linear-gradient(135deg, #FBBF24, #FDE68A)',
+    'linear-gradient(135deg, #A78BFA, #C4B5FD)',
+  ];
+  const idx = title.charCodeAt(0) % colors.length;
+  return { first, bg: colors[idx] };
+}
 
 export default function MainLayout() {
   const [activeModal, setActiveModal] = useState<ModalKey>(null);
-  const isDark = useThemeStore((s) => s.mode === 'dark');
+  const isDark = useThemeStore((s) => s.resolvedMode === 'dark');
   const {
     conversations, activeId, setActive, newConversation, deleteConversation,
     historyVisible, setHistoryVisible, sourceVisible, setSourceVisible,
-    sidebarCollapsed, setSidebarCollapsed,
+    sidebarCollapsed, setSidebarCollapsed, loadConversations,
   } = useChatStore();
 
   const showSidebar = !sidebarCollapsed && historyVisible;
@@ -52,11 +61,23 @@ export default function MainLayout() {
       })
     : conversations;
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
+
+  useEffect(() => {
+    void loadConversations();
+  }, [loadConversations]);
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem('rag-chat-store');
+    navigate('/login');
+  };
+
   const renderModalContent = () => {
     switch (activeModal) {
-      case 'knowledge': return <KnowledgeBasePage />;
-      case 'faq': return <FAQPage />;
-      case 'dashboard': return <DashboardPage />;
       case 'settings': return <SettingsPage />;
       default: return null;
     }
@@ -67,13 +88,16 @@ export default function MainLayout() {
 
       {/* ── Left Sidebar ──────────────────────────────────── */}
       {showSidebar && (
-        <div style={{
-          width: 260, flexShrink: 0,
-          background: 'var(--sidebar-bg)',
-          borderRight: '1px solid var(--border-subtle)',
-          boxShadow: isDark ? '2px 0 24px rgba(0,0,0,0.4)' : '2px 0 12px rgba(0,0,0,0.06)',
-          display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        }}>
+        <div
+          className="sidebar-container"
+          style={{
+            width: 260, flexShrink: 0,
+            background: 'var(--sidebar-bg)',
+            borderRight: '1px solid var(--border-subtle)',
+            boxShadow: isDark ? '2px 0 24px rgba(0,0,0,0.4)' : '2px 0 12px rgba(0,0,0,0.06)',
+            display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          }}
+        >
           {/* Logo */}
           <div
             style={{
@@ -82,23 +106,20 @@ export default function MainLayout() {
               cursor: 'pointer', flexShrink: 0,
             }}
           >
-            <div style={{
-              width: 32, height: 32, borderRadius: 8,
-              background: 'linear-gradient(135deg, var(--accent), var(--accent-dim))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: 'var(--accent-glow)', flexShrink: 0,
-            }}>
-              <ThunderboltOutlined style={{ color: '#fff', fontSize: 16 }} />
+            <div className="brand-logo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M20 2H4C2.9 2 2 2.9 2 4V16C2 17.1 2.9 18 4 18H6V22L10 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z" fill="currentColor" style={{ color: 'var(--text-primary)' }} />
+              </svg>
             </div>
             <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: 1, color: 'var(--text-primary)' }}>
-              {isDark ? 'NEURAL RAG' : 'RAG 智能问答'}
+              RAG 智能问答
             </span>
           </div>
 
           {/* New + Search */}
           <div style={{ padding: '10px 12px 6px', flexShrink: 0 }}>
             <Button type="primary" block size="small" icon={<PlusOutlined />}
-              onClick={() => newConversation()}
+              onClick={() => { void newConversation(); }}
               style={{ borderRadius: 8, height: 30, fontWeight: 600, fontSize: 12 }}>
               新对话
             </Button>
@@ -110,6 +131,7 @@ export default function MainLayout() {
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               allowClear
+              style={{ borderRadius: 8 }}
             />
           </div>
 
@@ -119,6 +141,10 @@ export default function MainLayout() {
               dataSource={filteredConversations}
               renderItem={(conv) => {
                 const isActive = conv.id === activeId;
+                const avatar = getConvAvatar(conv.title);
+                const lastMsg = conv.messages.length > 0
+                  ? conv.messages[conv.messages.length - 1].content.slice(0, 30)
+                  : '';
                 return (
                   <List.Item
                     onClick={() => setActive(conv.id)}
@@ -126,16 +152,30 @@ export default function MainLayout() {
                     actions={[
                       <Button
                         key="del" type="text" size="small" icon={<DeleteOutlined />}
-                        danger
-                        onClick={(e) => { e.stopPropagation(); deleteConversation(conv.id); }}
-                        title="删除对话"
                         className="conv-delete"
+                        onClick={(e) => { e.stopPropagation(); void deleteConversation(conv.id); }}
+                        title="删除对话"
+                        style={{ fontSize: 12, color: 'var(--text-muted)' }}
                       />,
                     ]}
                   >
                     <List.Item.Meta
+                      avatar={
+                        <div style={{
+                          width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                          background: avatar.bg,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: '#fff', fontSize: 13, fontWeight: 700,
+                        }}>
+                          {avatar.first}
+                        </div>
+                      }
                       title={<div className="conv-title">{conv.title}</div>}
-                      description={<span className="conv-time">{dayjs(conv.updatedAt).format('MM-DD HH:mm')}</span>}
+                      description={
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
+                          {lastMsg || dayjs(conv.updatedAt).format('MM-DD HH:mm')}
+                        </div>
+                      }
                     />
                   </List.Item>
                 );
@@ -145,21 +185,26 @@ export default function MainLayout() {
 
           {/* Status — pinned to bottom */}
           <div style={{
-            padding: '8px 12px', margin: '0 12px 12px', borderRadius: 8,
+            padding: '10px 12px', margin: '0 12px 12px', borderRadius: 12,
             background: 'var(--bg-hover)', border: '1px solid var(--border-subtle)',
             flexShrink: 0,
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{
-                width: 6, height: 6, borderRadius: '50%', background: 'var(--green)',
-                boxShadow: isDark ? '0 0 6px var(--green)' : 'none',
-                animation: 'pulse 2s infinite',
-              }} />
-              <span style={{ fontSize: 10, color: 'var(--green)', fontWeight: 500 }}>系统运行中</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="status-dot" />
+              <span style={{ fontSize: 11, color: 'var(--green)', fontWeight: 500 }}>系统运行中</span>
             </div>
-            <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 3 }}>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>
               Milvus · MySQL · Redis
             </div>
+            <Button
+              icon={<LogoutOutlined />}
+              block
+              size="small"
+              onClick={handleLogout}
+              style={{ marginTop: 10, borderRadius: 8, color: 'var(--text-secondary)', fontSize: 12 }}
+            >
+              退出登录
+            </Button>
           </div>
         </div>
       )}
@@ -191,30 +236,60 @@ export default function MainLayout() {
           <div style={{ flex: 1 }} />
 
           {/* Right: modal buttons */}
-          <button className="nav-btn" onClick={() => setActiveModal('knowledge')}>
-            <DatabaseOutlined /> 知识库管理
+          {location.pathname !== '/chat' && location.pathname !== '/' && (
+            <button className="nav-btn" onClick={() => navigate('/chat')}>
+              <MessageOutlined /> 返回聊天
+            </button>
+          )}
+
+          <button className="nav-btn" onClick={() => navigate('/tickets')}>
+            <CustomerServiceOutlined /> {user?.role === 'user' ? '我的工单' : '工单中心'}
           </button>
-          <button className="nav-btn" onClick={() => setActiveModal('faq')}>
-            <QuestionCircleOutlined /> FAQ 管理
-          </button>
-          <button className="nav-btn" onClick={() => setActiveModal('dashboard')}>
-            <DashboardOutlined /> 数据大盘
-          </button>
-          <button className="nav-btn" onClick={() => setActiveModal('settings')}>
-            <SettingOutlined /> 系统设置
-          </button>
+
+          {user?.role !== 'user' && (
+            <button className="nav-btn" onClick={() => navigate('/unresolved')}>
+              <BulbOutlined /> 未解决问题
+            </button>
+          )}
+
+          {user?.role !== 'user' && (
+            <button className="nav-btn" onClick={() => navigate('/dashboard')}>
+              <ThunderboltOutlined /> 运营看板
+            </button>
+          )}
+
+          {isAdmin && (
+            <button className="nav-btn" onClick={() => setActiveModal('settings')}>
+              <SettingOutlined /> 系统设置
+            </button>
+          )}
+
+          {isAdmin && (
+            <button className="nav-btn" onClick={() => navigate('/admin')}>
+              <SettingOutlined /> 管理后台
+            </button>
+          )}
 
           <button
             className={`nav-btn${sourceVisible ? ' active' : ''}`}
             onClick={() => setSourceVisible(!sourceVisible)}
             style={{ marginLeft: 4 }}
           >
-            <FileTextOutlined /> 引用来源
+            <FileTextOutlined /> 产品推荐
           </button>
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, overflow: 'hidden', background: 'var(--content-bg)', minHeight: 0 }}>
+        <div
+          className="fade-in"
+          style={{
+            flex: 1,
+            overflowY: location.pathname === '/chat' || location.pathname === '/' ? 'hidden' : 'auto',
+            overflowX: 'hidden',
+            background: 'var(--content-bg)',
+            minHeight: 0,
+          }}
+        >
           <Outlet />
         </div>
       </div>

@@ -14,7 +14,7 @@ export default function KnowledgeBasePage() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h2 style={{ marginBottom: 16 }}>知识库管理</h2>
+      <h2 style={{ marginBottom: 16, color: 'var(--text-primary)' }}>知识库管理</h2>
       <Tabs
         defaultActiveKey="list"
         items={[

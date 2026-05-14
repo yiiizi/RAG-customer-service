@@ -1,18 +1,31 @@
-import { useEffect, useRef } from 'react';
-import { Tag, Typography, message as antMsg } from 'antd';
-import { RobotOutlined, UserOutlined, ShoppingOutlined, CarOutlined, SafetyCertificateOutlined, GiftOutlined, CustomerServiceOutlined, CopyOutlined, ReloadOutlined } from '@ant-design/icons';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { App, Input, Modal, Select, Tag, Typography } from 'antd';
+import {
+  CarOutlined,
+  CopyOutlined,
+  CustomerServiceOutlined,
+  DislikeOutlined,
+  GiftOutlined,
+  LikeOutlined,
+  ReloadOutlined,
+  RobotOutlined,
+  SafetyCertificateOutlined,
+  ShoppingOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { useChatStore } from '@/stores/useChatStore';
 import MarkdownViewer from '@/components/MarkdownViewer';
-import { INTENT_LABELS, INTENT_COLORS } from '@/utils/constants';
+import { INTENT_COLORS, INTENT_LABELS } from '@/utils/constants';
 import { formatLatency } from '@/utils/format';
 import type { ChatMessage } from '@/types/chat';
+import { submitMessageFeedback } from '@/services/feedbackService';
 
 const SUGGESTED_QUESTIONS = [
-  { icon: <ShoppingOutlined />, text: '最近有什么优惠活动？' },
-  { icon: <CarOutlined />, text: '我的订单什么时候能到？' },
-  { icon: <SafetyCertificateOutlined />, text: '退换货政策是什么？' },
-  { icon: <GiftOutlined />, text: '怎么使用优惠券？' },
-  { icon: <CustomerServiceOutlined />, text: '如何联系人工客服？' },
+  { icon: <ShoppingOutlined />, text: '查询我的订单状态' },
+  { icon: <CarOutlined />, text: '我的快递到哪里了' },
+  { icon: <SafetyCertificateOutlined />, text: '退换货规则是什么' },
+  { icon: <GiftOutlined />, text: '有哪些优惠活动' },
+  { icon: <CustomerServiceOutlined />, text: '转人工客服' },
 ];
 
 function formatTime(ts: string) {
@@ -20,32 +33,82 @@ function formatTime(ts: string) {
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }
 
-function AssistantBubble({ msg, showThinking, onRegenerate }: { msg: ChatMessage; showThinking?: boolean; onRegenerate?: () => void }) {
+function AssistantBubble({
+  msg,
+  showThinking,
+  onRegenerate,
+}: {
+  msg: ChatMessage;
+  showThinking?: boolean;
+  onRegenerate?: () => void;
+}) {
   const isEmpty = !msg.content || !msg.content.trim();
+  const { message } = App.useApp();
+  const [feedbackSent, setFeedbackSent] = useState<'helpful' | 'unhelpful' | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackReason, setFeedbackReason] = useState('not_solved');
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const parsedMessageId = Number(msg.message_id ?? msg.id);
+  const messageId = Number.isFinite(parsedMessageId) ? parsedMessageId : undefined;
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(msg.content);
-    antMsg.success('已复制');
+    void navigator.clipboard.writeText(msg.content);
+    message.success('已复制');
+  };
+
+  const handleHelpful = async () => {
+    if (!messageId) {
+      message.warning('当前消息还未保存，稍后再反馈');
+      return;
+    }
+    setFeedbackSubmitting(true);
+    try {
+      await submitMessageFeedback(messageId, { rating: 'helpful' });
+      setFeedbackSent('helpful');
+      message.success('已记录反馈');
+    } finally {
+      setFeedbackSubmitting(false);
+    }
+  };
+
+  const handleUnhelpful = async () => {
+    if (!messageId) {
+      message.warning('当前消息还未保存，稍后再反馈');
+      return;
+    }
+    setFeedbackSubmitting(true);
+    try {
+      await submitMessageFeedback(messageId, {
+        rating: 'unhelpful',
+        reason: feedbackReason,
+        comment: feedbackComment.trim() || undefined,
+      });
+      setFeedbackSent('unhelpful');
+      setFeedbackOpen(false);
+      message.success('已记录反馈');
+    } finally {
+      setFeedbackSubmitting(false);
+    }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', gap: 10, marginBottom: 20, padding: '0 8px' }}>
+    <div className="msg-bubble-enter" style={{ display: 'flex', flexDirection: 'row', gap: 10, marginBottom: 12, padding: '0 8px' }}>
       <div style={{
-        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-        background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
+        width: 36, height: 36, borderRadius: 12, flexShrink: 0,
+        background: 'linear-gradient(135deg, #6C63FF, #8B7FFF)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 0 12px rgba(124,58,237,0.3)',
+        boxShadow: '0 0 12px rgba(108, 99, 255, 0.3)',
       }}>
-        <RobotOutlined style={{ color: '#fff' }} />
+        <RobotOutlined style={{ color: '#fff', fontSize: 16 }} />
       </div>
       <div style={{ maxWidth: '75%' }}>
         <div style={{
-          padding: '14px 18px', borderRadius: 12,
+          padding: '14px 18px', borderRadius: '18px 12px 12px 18px',
           background: 'var(--bg-card)',
           border: '1px solid var(--border-subtle)',
           lineHeight: 1.8, wordBreak: 'break-word',
           backdropFilter: 'blur(6px)',
-          display: 'flex', alignItems: 'center',
         }}>
           {showThinking && isEmpty ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -57,10 +120,9 @@ function AssistantBubble({ msg, showThinking, onRegenerate }: { msg: ChatMessage
             <MarkdownViewer content={msg.content} />
           )}
         </div>
-        {/* Meta row: intent + latency + timestamp */}
         <div style={{ marginTop: 4, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           {!isEmpty && msg.intent && (
-            <Tag color={INTENT_COLORS[msg.intent] || 'cyan'} style={{ fontSize: 10, borderRadius: 4 }}>
+            <Tag color={INTENT_COLORS[msg.intent] || 'cyan'} style={{ fontSize: 10, borderRadius: 6 }}>
               {INTENT_LABELS[msg.intent] || msg.intent}
             </Tag>
           )}
@@ -73,27 +135,55 @@ function AssistantBubble({ msg, showThinking, onRegenerate }: { msg: ChatMessage
             {formatTime(msg.timestamp)}
           </Typography.Text>
         </div>
-        {/* Action buttons */}
         {!isEmpty && !showThinking && (
-          <div style={{ marginTop: 4, display: 'flex', gap: 4 }}>
-            <button
-              className="msg-action-btn"
-              onClick={handleCopy}
-              title="复制"
-            >
+          <div style={{ marginTop: 4, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            <button className="msg-action-btn" onClick={handleCopy} title="复制">
               <CopyOutlined /> 复制
             </button>
             {onRegenerate && (
-              <button
-                className="msg-action-btn"
-                onClick={onRegenerate}
-                title="重新生成"
-              >
+              <button className="msg-action-btn" onClick={onRegenerate} title="重新生成">
                 <ReloadOutlined /> 重新生成
               </button>
             )}
+            <button className="msg-action-btn" onClick={handleHelpful} disabled={feedbackSubmitting || feedbackSent === 'helpful'} title="有帮助">
+              <LikeOutlined /> 有帮助
+            </button>
+            <button className="msg-action-btn" onClick={() => setFeedbackOpen(true)} disabled={feedbackSubmitting || feedbackSent === 'unhelpful'} title="没帮助">
+              <DislikeOutlined /> 没帮助
+            </button>
           </div>
         )}
+        <Modal
+          title="反馈原因"
+          open={feedbackOpen}
+          confirmLoading={feedbackSubmitting}
+          onOk={handleUnhelpful}
+          onCancel={() => setFeedbackOpen(false)}
+          okText="提交"
+          cancelText="取消"
+        >
+          <Select
+            value={feedbackReason}
+            onChange={setFeedbackReason}
+            style={{ width: '100%', marginBottom: 12 }}
+            options={[
+              { value: 'wrong_answer', label: '答非所问' },
+              { value: 'incomplete', label: '信息不完整' },
+              { value: 'outdated', label: '信息可能过期' },
+              { value: 'not_solved', label: '没解决问题' },
+              { value: 'need_human', label: '需要人工客服' },
+              { value: 'other', label: '其他' },
+            ]}
+          />
+          <Input.TextArea
+            value={feedbackComment}
+            onChange={(e) => setFeedbackComment(e.target.value)}
+            placeholder="可以补充具体问题，便于客服后续优化"
+            rows={4}
+            maxLength={1000}
+            showCount
+          />
+        </Modal>
       </div>
     </div>
   );
@@ -103,24 +193,24 @@ function MessageBubble({ msg, onRegenerate }: { msg: ChatMessage; onRegenerate?:
   const isUser = msg.role === 'user';
   if (!isUser) return <AssistantBubble msg={msg} onRegenerate={onRegenerate} />;
   return (
-    <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: 10, marginBottom: 20, padding: '0 8px' }}>
+    <div className="msg-bubble-enter" style={{ display: 'flex', flexDirection: 'row-reverse', gap: 10, marginBottom: 12, padding: '0 8px' }}>
       <div style={{
-        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-        background: 'linear-gradient(135deg, #00d4ff, #0098b3)',
+        width: 36, height: 36, borderRadius: 12, flexShrink: 0,
+        background: 'linear-gradient(135deg, #FF6584, #FF8FA3)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 0 12px rgba(0,212,255,0.3)',
+        boxShadow: '0 0 12px rgba(255, 101, 132, 0.3)',
       }}>
-        <UserOutlined style={{ color: '#fff' }} />
+        <UserOutlined style={{ color: '#fff', fontSize: 16 }} />
       </div>
       <div style={{ maxWidth: '75%' }}>
         <div style={{
-          padding: '14px 18px', borderRadius: 12,
-          background: 'var(--bg-hover)',
-          border: '1px solid var(--border-subtle)',
+          padding: '14px 18px', borderRadius: '12px 18px 18px 12px',
+          background: 'linear-gradient(135deg, #6C63FF, #7B73FF)',
+          border: 'none',
           lineHeight: 1.8, wordBreak: 'break-word',
-          backdropFilter: 'blur(6px)',
+          color: '#fff',
         }}>
-          <Typography.Text style={{ color: 'var(--text-primary)' }}>{msg.content}</Typography.Text>
+          <Typography.Text style={{ color: '#fff' }}>{msg.content}</Typography.Text>
         </div>
         <div style={{ marginTop: 4, textAlign: 'right' }}>
           <Typography.Text style={{ fontSize: 10, color: 'var(--text-muted)' }}>
@@ -133,27 +223,36 @@ function MessageBubble({ msg, onRegenerate }: { msg: ChatMessage; onRegenerate?:
 }
 
 function WelcomeScreen({ onQuickSend }: { onQuickSend: (text: string) => void }) {
-  const handleEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleEnter = (e: MouseEvent<HTMLDivElement>) => {
     e.currentTarget.style.borderColor = 'var(--accent)';
     e.currentTarget.style.background = 'var(--bg-hover)';
   };
-  const handleLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleLeave = (e: MouseEvent<HTMLDivElement>) => {
     e.currentTarget.style.borderColor = 'var(--border-subtle)';
     e.currentTarget.style.background = 'var(--bg-card)';
   };
 
   return (
-    <div style={{
+    <div className="fade-in" style={{
       flex: 1, display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', gap: 20,
       padding: '0 20px',
     }}>
       <div style={{ textAlign: 'center' }}>
+        <div style={{
+          width: 64, height: 64, borderRadius: 18,
+          background: 'linear-gradient(135deg, #6C63FF, #FF6584)',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          marginBottom: 16,
+          boxShadow: '0 8px 32px rgba(108, 99, 255, 0.3)',
+        }}>
+          <RobotOutlined style={{ color: '#fff', fontSize: 28 }} />
+        </div>
         <Typography.Title level={3} style={{ margin: 0, color: 'var(--text-primary)', fontWeight: 700 }}>
-          智能客服助手
+          智能客服问答
         </Typography.Title>
         <Typography.Text style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4, display: 'block' }}>
-          商品咨询 · 订单查询 · 物流追踪 · 售后服务
+          可以咨询订单、物流、售后、优惠活动，也可以直接转人工客服
         </Typography.Text>
       </div>
 
@@ -166,10 +265,10 @@ function WelcomeScreen({ onQuickSend }: { onQuickSend: (text: string) => void })
             onMouseLeave={handleLeave}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '6px 14px', borderRadius: 8,
+              padding: '8px 16px', borderRadius: 8,
               border: '1px solid var(--border-subtle)',
               background: 'var(--bg-card)',
-              cursor: 'pointer', transition: 'all 0.2s',
+              cursor: 'pointer', transition: 'all 0.25s',
               fontSize: 13, color: 'var(--text-primary)',
               whiteSpace: 'nowrap',
             }}
@@ -194,7 +293,9 @@ export default function ChatWindow({ onQuickSend, onRegenerate }: ChatWindowProp
   const conv = conversations.find((c) => c.id === activeId);
   const messages = conv?.messages ?? [];
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, streaming]);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streaming]);
 
   if (!activeId || messages.length === 0) {
     return <WelcomeScreen onQuickSend={onQuickSend || (() => {})} />;

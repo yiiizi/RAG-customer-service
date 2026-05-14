@@ -5,21 +5,21 @@ All values can be overridden by environment variables (e.g. MYSQL_HOST, REDIS_UR
 """
 
 import os
+from typing import ClassVar
 
 # Force offline mode for HuggingFace — must happen BEFORE any HF imports
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+_ = os.environ.setdefault("HF_HUB_OFFLINE", "1")
+_ = os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 # Workaround for OpenMP DLL conflict on Windows
-os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+_ = os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 from pathlib import Path
-from typing import Literal
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = {
+    model_config: ClassVar[SettingsConfigDict] = {
         "env_file": str(Path(__file__).resolve().parent / ".env"),
         "env_file_encoding": "utf-8",
         "case_sensitive": False,
@@ -120,6 +120,12 @@ class Settings(BaseSettings):
 
     # ── Web Search (Tavily) ───────────────────────────────────────
     TAVILY_API_KEY: str = ""
+
+    # ── JWT Authentication ──────────────────────────────────────
+    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
 
 settings = Settings()

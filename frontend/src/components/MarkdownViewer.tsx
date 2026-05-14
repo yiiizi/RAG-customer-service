@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import { Button, message } from 'antd';
+import { Button, App } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { copyText } from '@/utils/markdown';
 
@@ -10,6 +10,8 @@ interface Props {
 }
 
 export default function MarkdownViewer({ content }: Props) {
+  const { message } = App.useApp();
+
   const handleCopy = (text: string) => {
     copyText(text);
     message.success('已复制');
@@ -21,21 +23,34 @@ export default function MarkdownViewer({ content }: Props) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}
         components={{
-          pre: ({ children, ...props }) => (
-            <div style={{ position: 'relative' }}>
-              <pre {...props}>{children}</pre>
-              <Button
-                type="text"
-                size="small"
-                icon={<CopyOutlined />}
-                style={{ position: 'absolute', top: 4, right: 4, color: '#999' }}
-                onClick={() => {
-                  const text = extractText(children);
-                  handleCopy(text);
-                }}
-              />
-            </div>
-          ),
+          pre: ({ children, ...props }) => {
+            // Extract language from className
+            const codeChild = Array.isArray(children) ? children[0] : children;
+            let lang = '';
+            if (codeChild && typeof codeChild === 'object' && 'props' in codeChild) {
+              const className = (codeChild as React.ReactElement).props?.className || '';
+              const match = className.match(/language-(\w+)/);
+              if (match) lang = match[1];
+            }
+            return (
+              <div className="code-block-wrapper" style={{ position: 'relative', marginTop: 8, marginBottom: 8 }}>
+                {lang && (
+                  <span className="code-block-lang">{lang}</span>
+                )}
+                <pre {...props}>{children}</pre>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<CopyOutlined />}
+                  style={{ position: 'absolute', top: 4, right: 4, color: 'var(--text-muted)', zIndex: 2 }}
+                  onClick={() => {
+                    const text = extractText(children);
+                    handleCopy(text);
+                  }}
+                />
+              </div>
+            );
+          },
           code: ({ className, children, ...props }) => {
             const isInline = !className;
             if (isInline) {

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { FAQItem } from '@/types/faq';
+import type { FAQCreateRequest, FAQItem } from '@/types/faq';
 import * as api from '@/services/faqService';
 
 interface FAQState {
@@ -16,8 +16,8 @@ interface FAQState {
   setCategory: (cat: string) => void;
   setPage: (p: number) => void;
   setPageSize: (ps: number) => void;
-  create: (data: { question: string; answer: string; category: string }) => Promise<void>;
-  update: (id: string, data: { question?: string; answer?: string; category?: string }) => Promise<void>;
+  create: (data: FAQCreateRequest) => Promise<void>;
+  update: (id: string, data: Partial<FAQCreateRequest>) => Promise<void>;
   remove: (id: string) => Promise<void>;
 }
 

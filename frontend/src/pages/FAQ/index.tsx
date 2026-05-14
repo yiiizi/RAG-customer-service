@@ -13,7 +13,7 @@ export default function FAQPage() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h2 style={{ marginBottom: 16 }}>FAQ 高频问答管理</h2>
+      <h2 style={{ marginBottom: 16, color: 'var(--text-primary)' }}>FAQ 高频问答管理</h2>
       <Tabs
         defaultActiveKey="list"
         items={[

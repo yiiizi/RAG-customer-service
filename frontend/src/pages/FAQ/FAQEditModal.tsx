@@ -1,5 +1,5 @@
 import { useState, cloneElement, type ReactElement } from 'react';
-import { Modal, Form, Input, Select, message } from 'antd';
+import { Modal, Form, Input, Select, App } from 'antd';
 import { useFAQStore } from '@/stores/useFAQStore';
 
 interface Props {
@@ -9,6 +9,9 @@ interface Props {
     question: string;
     answer: string;
     category: string;
+    status?: string;
+    priority?: number;
+    similar_questions?: string[];
   };
   children: ReactElement;
 }
@@ -18,6 +21,7 @@ export default function FAQEditModal({ mode, record, children }: Props) {
   const [form] = Form.useForm();
   const { create, update } = useFAQStore();
   const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
 
   const handleOk = async () => {
     const values = await form.validateFields();
@@ -74,6 +78,22 @@ export default function FAQEditModal({ mode, record, children }: Props) {
                 { label: '技术', value: 'tech' },
               ]}
             />
+          </Form.Item>
+          <Form.Item name="status" label="状态" initialValue="active">
+            <Select
+              options={[
+                { label: '草稿', value: 'draft' },
+                { label: '已发布', value: 'active' },
+                { label: '已停用', value: 'inactive' },
+                { label: '已驳回', value: 'rejected' },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item name="priority" label="优先级" initialValue={0}>
+            <Input type="number" min={0} max={100} />
+          </Form.Item>
+          <Form.Item name="similar_questions" label="相似问">
+            <Select mode="tags" tokenSeparators={['\n']} placeholder="输入相似问后回车" />
           </Form.Item>
         </Form>
       </Modal>

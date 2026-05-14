@@ -1,0 +1,196 @@
+{
+  "products": [
+    {
+      "product_id": "P1001",
+      "name": "星曜手机 Pro Max",
+      "category": "手机数码",
+      "brand": "星曜",
+      "description": "旗舰影像手机，适合拍照、游戏和高频办公。",
+      "price": 2999,
+      "stock": 320,
+      "promotion": "限时立减 300",
+      "service_policy": "7 天无理由，1 年质保",
+      "recommend_reason": "近期咨询量最高，适合推荐给关注性能和拍照的用户。",
+      "tags": ["5G", "高刷屏", "旗舰影像"],
+      "status": "active"
+    },
+    {
+      "product_id": "P1002",
+      "name": "云听降噪耳机",
+      "category": "音频设备",
+      "brand": "云听",
+      "description": "主动降噪，长续航，适合通勤和会议。",
+      "price": 199,
+      "stock": 128,
+      "promotion": "第二件 8 折",
+      "service_policy": "7 天无理由，1 年质保",
+      "recommend_reason": "客单价低，适合搭配手机订单推荐。",
+      "tags": ["降噪", "蓝牙", "长续航"],
+      "status": "active"
+    },
+    {
+      "product_id": "P1003",
+      "name": "灵动智能手表 S3",
+      "category": "智能穿戴",
+      "brand": "灵动",
+      "description": "健康监测、运动记录、消息提醒一体化。",
+      "price": 599,
+      "stock": 64,
+      "promotion": "赠送表带",
+      "service_policy": "15 天换新，1 年质保",
+      "recommend_reason": "适合对运动健康和手机配件感兴趣的用户。",
+      "tags": ["健康", "运动", "NFC"],
+      "status": "active"
+    },
+    {
+      "product_id": "P1004",
+      "name": "疾速充电宝 20000mAh",
+      "category": "数码配件",
+      "brand": "疾速",
+      "description": "大容量移动电源，支持多设备快充。",
+      "price": 129,
+      "stock": 800,
+      "promotion": "满 99 包邮",
+      "service_policy": "7 天无理由，1 年质保",
+      "recommend_reason": "物流和售后咨询少，适合做稳定推荐商品。",
+      "tags": ["快充", "大容量", "便携"],
+      "status": "active"
+    },
+    {
+      "product_id": "P1005",
+      "name": "静音机械键盘 K870T",
+      "category": "办公外设",
+      "brand": "青轴工坊",
+      "description": "87 键布局，低噪轴体，适合办公和游戏。",
+      "price": 399,
+      "stock": 86,
+      "promotion": "领券减 50",
+      "service_policy": "30 天换新，1 年质保",
+      "recommend_reason": "客单价适中，适合咨询办公设备的用户。",
+      "tags": ["办公", "机械轴", "低噪"],
+      "status": "active"
+    }
+  ],
+  "orders": [
+    {
+      "order_id": "00010001",
+      "user_id": 1,
+      "status": "已发货",
+      "created_at": "2026-05-01 14:30:00",
+      "paid_at": "2026-05-01 14:31:00",
+      "shipped_at": "2026-05-02 09:00:00",
+      "payment_method": "支付宝",
+      "total_amount": 2999,
+      "address": "上海市浦东新区示例路 100 号",
+      "logistics_no": "SF000100010001",
+      "items": [
+        {
+          "product_id": "P1001",
+          "name": "星曜手机 Pro Max",
+          "sku": "曜石黑 / 256GB",
+          "quantity": 1,
+          "price": 2999
+        }
+      ]
+    },
+    {
+      "order_id": "00010002",
+      "user_id": 1,
+      "status": "待发货",
+      "created_at": "2026-05-03 10:15:00",
+      "paid_at": "2026-05-03 10:16:00",
+      "shipped_at": null,
+      "payment_method": "微信支付",
+      "total_amount": 798,
+      "address": "上海市浦东新区示例路 100 号",
+      "logistics_no": null,
+      "items": [
+        {
+          "product_id": "P1003",
+          "name": "灵动智能手表 S3",
+          "sku": "黑色 / 42mm",
+          "quantity": 1,
+          "price": 599
+        },
+        {
+          "product_id": "P1002",
+          "name": "云听降噪耳机",
+          "sku": "珍珠白",
+          "quantity": 1,
+          "price": 199
+        }
+      ]
+    },
+    {
+      "order_id": "00010003",
+      "user_id": 1,
+      "status": "已签收",
+      "created_at": "2026-04-25 16:45:00",
+      "paid_at": "2026-04-25 16:46:00",
+      "shipped_at": "2026-04-26 08:30:00",
+      "payment_method": "银行卡",
+      "total_amount": 129,
+      "address": "上海市浦东新区示例路 100 号",
+      "logistics_no": "ZT000100030001",
+      "items": [
+        {
+          "product_id": "P1004",
+          "name": "疾速充电宝 20000mAh",
+          "sku": "黑色",
+          "quantity": 1,
+          "price": 129
+        }
+      ]
+    }
+  ],
+  "logistics": [
+    {
+      "logistics_no": "SF000100010001",
+      "order_id": "00010001",
+      "company": "顺丰速运",
+      "status": "运输中",
+      "eta": "2026-05-05",
+      "tracks": [
+        {
+          "time": "2026-05-02 09:00:00",
+          "location": "上海仓",
+          "detail": "商品已出库"
+        },
+        {
+          "time": "2026-05-02 18:30:00",
+          "location": "上海分拨中心",
+          "detail": "快件已到达分拨中心"
+        },
+        {
+          "time": "2026-05-03 08:20:00",
+          "location": "苏州中转场",
+          "detail": "快件运输中"
+        }
+      ]
+    },
+    {
+      "logistics_no": "ZT000100030001",
+      "order_id": "00010003",
+      "company": "中通快递",
+      "status": "已签收",
+      "eta": null,
+      "tracks": [
+        {
+          "time": "2026-04-26 08:30:00",
+          "location": "上海仓",
+          "detail": "商品已出库"
+        },
+        {
+          "time": "2026-04-27 15:10:00",
+          "location": "浦东新区网点",
+          "detail": "快件正在派送"
+        },
+        {
+          "time": "2026-04-27 18:45:00",
+          "location": "浦东新区示例路",
+          "detail": "本人签收"
+        }
+      ]
+    }
+  ]
+}

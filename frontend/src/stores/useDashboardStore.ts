@@ -1,21 +1,26 @@
 import { create } from 'zustand';
 import type { DashboardStats } from '@/types/dashboard';
-import { getDashboardStats } from '@/services/dashboardService';
+import { getDashboardStats, type DashboardRange } from '@/services/dashboardService';
 
 interface DashboardState {
   stats: DashboardStats | null;
   loading: boolean;
-  fetch: () => Promise<void>;
+  range: DashboardRange;
+  setRange: (range: DashboardRange) => void;
+  fetch: (range?: DashboardRange) => Promise<void>;
 }
 
-export const useDashboardStore = create<DashboardState>((set) => ({
+export const useDashboardStore = create<DashboardState>((set, get) => ({
   stats: null,
   loading: false,
-  fetch: async () => {
+  range: '7d',
+  setRange: (range) => set({ range }),
+  fetch: async (range) => {
+    const selectedRange = range ?? get().range;
     set({ loading: true });
     try {
-      const stats = await getDashboardStats();
-      set({ stats, loading: false });
+      const stats = await getDashboardStats(selectedRange);
+      set({ stats, range: selectedRange, loading: false });
     } catch {
       set({ loading: false });
     }

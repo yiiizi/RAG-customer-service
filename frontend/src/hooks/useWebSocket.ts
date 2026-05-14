@@ -49,7 +49,7 @@ export function useWebSocket(onMessage: MsgHandler) {
     setConnectionStatus('retrying');
 
     ws.onopen = () => {
-      console.log('WebSocket connected');
+      console.log('[WS] connected');
       retryCountRef.current = 0;
       setConnectionStatus('connected');
       flushPending();
@@ -65,38 +65,27 @@ export function useWebSocket(onMessage: MsgHandler) {
     };
 
     ws.onclose = () => {
-      if (retryCountRef.current >= MAX_RETRIES) {
-        console.warn('WebSocket: max retries reached');
-        setConnectionStatus('disconnected');
-        return;
-      }
+      // Silently reconnect — never expose disconnected status to UI
       const delay = Math.min(INITIAL_DELAY * Math.pow(2, retryCountRef.current), MAX_DELAY);
       retryCountRef.current++;
-      setConnectionStatus('retrying');
-      console.log(`WebSocket closed — reconnecting in ${delay / 1000}s (attempt ${retryCountRef.current})`);
+      console.log(`[WS] closed — reconnecting in ${delay / 1000}s (attempt ${retryCountRef.current})`);
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = setTimeout(() => doConnect(), delay);
     };
 
     ws.onerror = () => {
+      console.warn('[WS] error');
       ws.close();
     };
   }, [flushPending]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-    retryCountRef.current = MAX_RETRIES;
+    retryCountRef.current = MAX_RETRIES; // prevent auto-reconnect after manual disconnect
     wsRef.current?.close();
     wsRef.current = null;
     setConnectionStatus('disconnected');
   }, []);
-
-  const reconnect = useCallback(() => {
-    disconnect();
-    retryCountRef.current = 0;
-    setConnectionStatus('retrying');
-    doConnect();
-  }, [disconnect, doConnect]);
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
@@ -104,5 +93,5 @@ export function useWebSocket(onMessage: MsgHandler) {
     doConnect();
   }, [doConnect]);
 
-  return { connect, send, disconnect, reconnect, connectionStatus };
+  return { connect, send, disconnect, connectionStatus };
 }

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Input, Button } from 'antd';
-import { SendOutlined, DatabaseOutlined, GlobalOutlined, StopOutlined, ReloadOutlined } from '@ant-design/icons';
+import { SendOutlined, GlobalOutlined, StopOutlined } from '@ant-design/icons';
 import { useChatStore } from '@/stores/useChatStore';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import type { SourceItem } from '@/types/chat';
@@ -12,13 +12,11 @@ interface ChatInputProps {
 
 export default function ChatInput({ sendRef }: ChatInputProps) {
   const [value, setValue] = useState('');
-  const [kbOnly, setKbOnly] = useState(false);
   const [webSearch, setWebSearch] = useState(false);
-  const { activeId, streaming, setStreaming, addMessage, appendToLast, updateLastSources, updateLastMeta, newConversation } =
+  const { activeId, streaming, setStreaming, addMessage, appendToLast, updateLastSources, updateLastMeta, updateLastMessageId, newConversation } =
     useChatStore();
   const inputRef = useRef<any>(null);
 
-  // FIFO queue: each send enqueues convId, each done/error dequeues
   const convQueue = useRef<string[]>([]);
   const activeConvId = useRef<string | null>(null);
 
@@ -32,7 +30,8 @@ export default function ChatInput({ sendRef }: ChatInputProps) {
         }
       }
 
-      const convId = activeConvId.current;
+      const savedPayload = type === 'message_saved' ? data.data as Record<string, unknown> | undefined : undefined;
+      const convId = activeConvId.current || (savedPayload?.conversation_id ? String(savedPayload.conversation_id) : null);
       if (!convId) return;
 
       if (type === 'sources') {
@@ -51,10 +50,15 @@ export default function ChatInput({ sendRef }: ChatInputProps) {
           intent: meta?.intent as string,
           latency_ms: meta?.latency_ms as number,
         });
-        activeConvId.current = null;
         if (convQueue.current.length === 0) {
           setStreaming(false);
         }
+      } else if (type === 'message_saved') {
+        const messageId = Number(savedPayload?.message_id);
+        if (Number.isFinite(messageId)) {
+          updateLastMessageId(convId, messageId);
+        }
+        activeConvId.current = null;
       } else if (type === 'error') {
         appendToLast(convId, `\n\n> ⚠️ 错误: ${data.data}`);
         activeConvId.current = null;
@@ -63,21 +67,28 @@ export default function ChatInput({ sendRef }: ChatInputProps) {
         }
       }
     },
-    [appendToLast, updateLastSources, updateLastMeta, setStreaming]
+    [appendToLast, updateLastSources, updateLastMeta, updateLastMessageId, setStreaming]
   );
 
-  const { connect, send, disconnect, reconnect, connectionStatus } = useWebSocket(handleMessage);
+  const { connect, send, disconnect, connectionStatus } = useWebSocket(handleMessage);
 
-  // Build and send a query (used by both direct send and sendRef)
-  const doSend = useCallback((textOverride?: string) => {
+  // Auto-connect on mount (once only)
+  const hasAutoConnected = useRef(false);
+  useEffect(() => {
+    if (!hasAutoConnected.current) {
+      hasAutoConnected.current = true;
+      connect();
+    }
+  }, [connect]);
+
+  const doSend = useCallback(async (textOverride?: string) => {
     const text = (textOverride ?? value).trim();
     if (!text || streaming) return;
 
-    // Get latest conversations from store (not stale closure)
     const state = useChatStore.getState();
     let convId = activeId ?? state.activeId;
-    if (!convId) {
-      convId = newConversation();
+    if (!convId || !state.conversations.some((conv) => conv.id === convId)) {
+      convId = await newConversation();
     }
 
     convQueue.current.push(convId);
@@ -92,20 +103,25 @@ export default function ChatInput({ sendRef }: ChatInputProps) {
     inputRef.current?.focus();
 
     connect();
-    const conv = state.conversations.find((c: any) => c.id === convId);
-    const history = conv?.messages
-      .filter((m: any) => m.content.trim())
-      .slice(-10)
-      .map((m: any) => ({ role: m.role, content: m.content })) || [];
-    send({ query: text, kb_only: kbOnly, web_search: webSearch, history });
-  }, [value, streaming, activeId, addMessage, setStreaming, newConversation, connect, send, kbOnly, webSearch]);
+    send({ query: text, conversation_id: Number(convId), kb_only: false, web_search: webSearch });
+  }, [value, streaming, activeId, addMessage, setStreaming, newConversation, connect, send, webSearch]);
 
-  // Expose doSend to parent via ref — simple reuse, no duplication
   useEffect(() => {
     if (sendRef) {
-      sendRef.current = (text: string) => doSend(text);
+      sendRef.current = (text: string) => { void doSend(text); };
     }
   }, [doSend, sendRef]);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const text = (event as CustomEvent<string>).detail;
+      if (typeof text === 'string' && text.trim()) {
+        void doSend(text);
+      }
+    };
+    window.addEventListener('rag:quick-send', handler);
+    return () => window.removeEventListener('rag:quick-send', handler);
+  }, [doSend]);
 
   const handleStop = () => {
     disconnect();
@@ -124,75 +140,63 @@ export default function ChatInput({ sendRef }: ChatInputProps) {
           onChange={(e) => setValue(e.target.value)}
           placeholder="输入你的问题... (Shift+Enter 换行，Enter 发送)"
           autoSize={{ minRows: 2, maxRows: 4 }}
-          onPressEnter={(e) => { if (!e.shiftKey) { e.preventDefault(); doSend(); } }}
+          onPressEnter={(e) => { if (!e.shiftKey) { e.preventDefault(); void doSend(); } }}
           disabled={streaming}
-          style={{ borderRadius: 12, padding: '10px 52px 36px 14px', fontSize: 14, lineHeight: 1.8, resize: 'none' }}
+          style={{
+            borderRadius: 12,
+            padding: '12px 52px 40px 16px',
+            fontSize: 14,
+            lineHeight: 1.8,
+            resize: 'none',
+            background: 'var(--input-bg)',
+            boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.1)',
+          }}
         />
-        {/* KB-only toggle */}
-        <span
-          onClick={(e) => { e.stopPropagation(); setKbOnly(!kbOnly); }}
-          style={{
-            position: 'absolute', left: 8, bottom: 8, zIndex: 5,
-            height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4,
-            padding: '0 8px', cursor: 'pointer',
-            color: kbOnly ? '#69b1ff' : 'var(--text-muted)',
-            fontSize: 12, transition: 'color 0.2s', userSelect: 'none',
-          }}
-        >
-          <DatabaseOutlined style={{ fontSize: 14 }} />
-          <span>知识库</span>
-        </span>
-        {/* Web search toggle */}
-        <span
-          onClick={(e) => { e.stopPropagation(); setWebSearch(!webSearch); }}
-          style={{
-            position: 'absolute', left: 82, bottom: 8, zIndex: 5,
-            height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4,
-            padding: '0 8px', cursor: 'pointer',
-            color: webSearch ? '#ffa940' : 'var(--text-muted)',
-            fontSize: 12, transition: 'color 0.2s', userSelect: 'none',
-          }}
-        >
-          <GlobalOutlined style={{ fontSize: 14 }} />
-          <span>联网</span>
-        </span>
+
+        {/* Capsule toggles */}
+        <div style={{ position: 'absolute', left: 8, bottom: 8, zIndex: 5, display: 'flex', gap: 6 }}>
+          <span
+            className={`capsule-toggle${webSearch ? ' active' : ''}`}
+            onClick={(e) => { e.stopPropagation(); setWebSearch(!webSearch); }}
+          >
+            <GlobalOutlined style={{ fontSize: 12 }} />
+            <span>联网</span>
+          </span>
+        </div>
+
         {/* Send / Stop button */}
         {streaming ? (
           <Button
             danger
-            icon={<StopOutlined style={{ fontSize: 18 }} />}
+            icon={<StopOutlined style={{ fontSize: 16 }} />}
             onClick={handleStop}
             style={{
               position: 'absolute', right: 8, bottom: 10,
-              width: 36, height: 36, borderRadius: 8,
+              width: 40, height: 40, borderRadius: 12,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           />
         ) : (
-          <Button
-            type="primary"
-            icon={<SendOutlined style={{ fontSize: 18 }} />}
-            onClick={() => doSend()}
+          <button
+            onClick={() => { void doSend(); }}
             style={{
               position: 'absolute', right: 8, bottom: 10,
-              width: 36, height: 36, borderRadius: 8,
+              width: 40, height: 40, borderRadius: 12,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'linear-gradient(135deg, #6C63FF, #FF6584)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(108, 99, 255, 0.3)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              color: '#fff',
             }}
-          />
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(108, 99, 255, 0.4)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(108, 99, 255, 0.3)'; }}
+          >
+            <SendOutlined style={{ fontSize: 18 }} />
+          </button>
         )}
       </div>
-      {/* Connection status banner — below input */}
-      {connectionStatus === 'disconnected' && (
-        <div style={{
-          marginTop: 8, padding: '6px 12px', borderRadius: 8, width: '56%', minWidth: 360, maxWidth: 680,
-          background: 'rgba(255, 68, 114, 0.1)', border: '1px solid rgba(255, 68, 114, 0.3)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
-        }}>
-          <span style={{ fontSize: 12, color: 'var(--red)' }}>连接已断开</span>
-          <Button size="small" icon={<ReloadOutlined />} onClick={reconnect}
-            style={{ fontSize: 11, height: 24 }}>重新连接</Button>
-        </div>
-      )}
     </div>
   );
 }

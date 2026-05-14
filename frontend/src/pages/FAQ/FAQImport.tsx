@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, Button, message, Table, Card, Typography, Alert } from 'antd';
+import { Upload, Button, App, Table, Card, Typography, Alert } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { FAQBatchImportResponse } from '@/types/faq';
 import * as api from '@/services/faqService';
@@ -9,6 +9,7 @@ import Papa from 'papaparse';
 export default function FAQImport() {
   const [result, setResult] = useState<FAQBatchImportResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
 
   const handleUpload = async (file: File) => {
     setLoading(true);

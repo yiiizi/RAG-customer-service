@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, message, Card, Typography } from 'antd';
+import { Upload, App, Card, Typography } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { useKnowledgeStore } from '@/stores/useKnowledgeStore';
 import { SUPPORTED_FILE_TYPES } from '@/utils/constants';
@@ -9,6 +9,7 @@ const { Dragger } = Upload;
 export default function DocUpload() {
   const { uploadFile, uploading } = useKnowledgeStore();
   const [fileList, setFileList] = useState<any[]>([]);
+  const { message } = App.useApp();
 
   const handleUpload = async (options: any) => {
     const { file, onSuccess, onError } = options;

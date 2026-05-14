@@ -1,10 +1,16 @@
+import { useEffect } from 'react';
 import { Input, List, Button } from 'antd';
 import { PlusOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { useChatStore } from '@/stores/useChatStore';
 import dayjs from 'dayjs';
 
 export default function ChatHistory() {
-  const { conversations, activeId, setActive, newConversation, deleteConversation } = useChatStore();
+  const { conversations, activeId, setActive, newConversation, deleteConversation, loadConversations } = useChatStore();
+  
+  // Load conversations from backend on mount
+  useEffect(() => {
+    loadConversations();
+  }, []);
 
   const isEmpty = (conv: typeof conversations[0]) =>
     !conv.messages.some((m) => m.role === 'user' && m.content.trim());
@@ -25,7 +31,7 @@ export default function ChatHistory() {
           type="primary"
           block
           icon={<PlusOutlined />}
-          onClick={() => newConversation()}
+          onClick={() => { void newConversation(); }}
           style={{ borderRadius: 8, height: 34, fontWeight: 600, fontSize: 13 }}
         >
           新对话
@@ -60,7 +66,7 @@ export default function ChatHistory() {
                     icon={<DeleteOutlined />}
                     disabled={empty}
                     danger={!empty}
-                    onClick={(e) => { e.stopPropagation(); if (!empty) deleteConversation(conv.id); }}
+                    onClick={(e) => { e.stopPropagation(); if (!empty) void deleteConversation(conv.id); }}
                     title={empty ? '输入内容后可删除' : '删除对话'}
                     style={empty ? { color: 'var(--text-muted)', opacity: 0.4 } : {}}
                   />,

@@ -113,6 +113,7 @@ async def generate(
     intent: str = "knowledge_qa",
     history: list[dict] | None = None,
     extra_info: str | None = None,
+    model_cfg: dict | None = None,
 ) -> str:
     """
     Generate an answer via LLM.
@@ -145,19 +146,25 @@ async def generate(
     else:
         messages = _build_chat_prompt(query, history)
 
+    api_base = model_cfg.get("api_base") if model_cfg else settings.LLM_API_BASE
+    api_key = model_cfg.get("api_key") if model_cfg else settings.LLM_API_KEY
+    model = model_cfg.get("model") if model_cfg else settings.LLM_MODEL
+    temperature = model_cfg.get("temperature") if model_cfg else settings.LLM_TEMPERATURE
+    max_tokens = model_cfg.get("max_tokens") if model_cfg else settings.LLM_MAX_TOKENS
+
     try:
         async with httpx.AsyncClient(timeout=settings.LLM_TIMEOUT) as client:
             resp = await client.post(
-                f"{settings.LLM_API_BASE}/chat/completions",
+                f"{api_base}/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {settings.LLM_API_KEY}",
+                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": settings.LLM_MODEL,
+                    "model": model,
                     "messages": messages,
-                    "temperature": settings.LLM_TEMPERATURE,
-                    "max_tokens": settings.LLM_MAX_TOKENS,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
                     "stream": False,
                 },
             )
@@ -178,6 +185,7 @@ async def generate_stream(
     intent: str = "knowledge_qa",
     history: list[dict] | None = None,
     extra_info: str | None = None,
+    model_cfg: dict | None = None,
 ) -> AsyncIterator[str]:
     """
     Stream LLM tokens via SSE.
@@ -192,20 +200,26 @@ async def generate_stream(
     else:
         messages = _build_chat_prompt(query, history)
 
+    api_base = model_cfg.get("api_base") if model_cfg else settings.LLM_API_BASE
+    api_key = model_cfg.get("api_key") if model_cfg else settings.LLM_API_KEY
+    model = model_cfg.get("model") if model_cfg else settings.LLM_MODEL
+    temperature = model_cfg.get("temperature") if model_cfg else settings.LLM_TEMPERATURE
+    max_tokens = model_cfg.get("max_tokens") if model_cfg else settings.LLM_MAX_TOKENS
+
     try:
         async with httpx.AsyncClient(timeout=settings.LLM_TIMEOUT) as client:
             async with client.stream(
                 "POST",
-                f"{settings.LLM_API_BASE}/chat/completions",
+                f"{api_base}/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {settings.LLM_API_KEY}",
+                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": settings.LLM_MODEL,
+                    "model": model,
                     "messages": messages,
-                    "temperature": settings.LLM_TEMPERATURE,
-                    "max_tokens": settings.LLM_MAX_TOKENS,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
                     "stream": True,
                 },
             ) as resp:

@@ -4,17 +4,33 @@ import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider, App as AntApp, theme as antTheme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import App from './App';
-import { useThemeStore } from './stores/useThemeStore';
+import { useThemeStore, applyThemeToDOM } from './stores/useThemeStore';
 import './global.css';
 
-function Root() {
-  const mode = useThemeStore((s) => s.mode);
-  const isDark = mode === 'dark';
+// ★ 关键：在 React 渲染前同步设置 data-theme，避免首帧闪烁/CSS变量不生效
+// 这行必须在任何渲染前执行，确保 CSS 变量和 [data-theme] 选择器立即生效
+applyThemeToDOM(useThemeStore.getState().resolvedMode);
 
-  // Apply data-theme to <html> so CSS can respond
+function Root() {
+  const resolvedMode = useThemeStore((s) => s.resolvedMode);
+  const isDark = resolvedMode === 'dark';
+
+  // 保持 data-theme 与 store 同步
   React.useEffect(() => {
-    document.documentElement.setAttribute('data-theme', mode);
-  }, [mode]);
+    applyThemeToDOM(resolvedMode);
+  }, [resolvedMode]);
+
+  const sharedToken = {
+    colorPrimary: '#6C63FF',
+    colorSuccess: '#4ADE80',
+    colorWarning: '#FBBF24',
+    colorError: '#F87171',
+    colorInfo: '#6C63FF',
+    borderRadius: 6,
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif",
+    fontSize: 14,
+    lineHeight: 1.6,
+  };
 
   return (
     <ConfigProvider
@@ -23,28 +39,37 @@ function Root() {
         algorithm: isDark ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
         token: isDark
           ? {
-              colorPrimary: '#00d4ff',
-              colorSuccess: '#00ff88',
-              colorWarning: '#ffb300',
-              colorError: '#ff4472',
-              colorInfo: '#00d4ff',
-              borderRadius: 8,
-              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif",
-              fontSize: 14,
-              lineHeight: 1.6,
+              ...sharedToken,
+              colorBgContainer: '#1A1A2E',
+              colorBgElevated: '#1E1E32',
+              colorBgLayout: '#0D0D1A',
+              colorBorder: '#4A4A6A',
+              colorBorderSecondary: '#4A4A6A',
+              colorText: '#E8E8F0',
+              colorTextSecondary: '#8888A0',
+              colorTextTertiary: '#5C5C78',
+              colorFillSecondary: 'rgba(108, 99, 255, 0.15)',
             }
           : {
-              colorPrimary: '#1677ff',
-              borderRadius: 8,
-              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif",
-              fontSize: 14,
-              lineHeight: 1.6,
+              ...sharedToken,
+              colorBgContainer: '#FFFFFF',
+              colorBgElevated: '#FFFFFF',
+              colorBgLayout: '#F8F9FF',
+              colorBorder: '#E0E0F0',
+              colorBorderSecondary: '#E0E0F0',
+              colorText: '#1A1A2E',
+              colorTextSecondary: '#8888A0',
+              colorTextTertiary: '#A0A0B8',
+              colorFillSecondary: 'rgba(108, 99, 255, 0.08)',
             },
         components: isDark
           ? {
-              Layout: { siderBg: '#0d1321', triggerBg: '#0d1321', triggerColor: '#00d4ff' },
+              Layout: { siderBg: '#1A1A2E', triggerBg: '#1A1A2E', triggerColor: '#6C63FF' },
+              Menu: { darkItemBg: 'transparent', darkItemSelectedBg: 'rgba(108,99,255,0.15)' },
             }
-          : {},
+          : {
+              Layout: { siderBg: '#F0F1FF', triggerBg: '#F0F1FF', triggerColor: '#6C63FF' },
+            },
       }}
     >
       <AntApp>

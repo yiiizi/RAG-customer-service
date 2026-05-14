@@ -1,19 +1,26 @@
 import { useEffect } from 'react';
 import {
+  Button,
+  Input,
+  message,
+  Popconfirm,
+  Select,
+  Space,
   Table,
   Tag,
-  Button,
-  Space,
-  Input,
-  Select,
-  Popconfirm,
-  message,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useFAQStore } from '@/stores/useFAQStore';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useDebounceFn } from 'ahooks';
-import { formatDate } from '@/utils/format';
 import FAQEditModal from './FAQEditModal';
+import { useFAQStore } from '@/stores/useFAQStore';
+import { formatDate } from '@/utils/format';
+
+const STATUS_META: Record<string, { label: string; color: string }> = {
+  draft: { label: '草稿', color: 'gold' },
+  active: { label: '已发布', color: 'green' },
+  inactive: { label: '已停用', color: 'default' },
+  rejected: { label: '已驳回', color: 'red' },
+};
 
 export default function FAQTable() {
   const {
@@ -32,13 +39,13 @@ export default function FAQTable() {
   } = useFAQStore();
 
   const { run: debouncedSearch } = useDebounceFn(
-    () => fetchList(),
+    () => { void fetchList(); },
     { wait: 300 }
   );
 
   useEffect(() => {
     debouncedSearch();
-  }, [keyword, category, page, debouncedSearch]);
+  }, [keyword, category, page, pageSize, debouncedSearch]);
 
   const handleDelete = async (id: string) => {
     await remove(id);
@@ -94,15 +101,28 @@ export default function FAQTable() {
             title: '问题',
             dataIndex: 'question',
             ellipsis: true,
-            render: (text: string) => (
-              <span title={text}>{text}</span>
-            ),
+            render: (text: string) => <span title={text}>{text}</span>,
           },
           {
             title: '分类',
             dataIndex: 'category',
             width: 100,
             render: (cat: string) => <Tag>{cat}</Tag>,
+          },
+          {
+            title: '状态',
+            dataIndex: 'status',
+            width: 100,
+            render: (status: string) => {
+              const meta = STATUS_META[status] || STATUS_META.inactive;
+              return <Tag color={meta.color}>{meta.label}</Tag>;
+            },
+          },
+          {
+            title: '优先级',
+            dataIndex: 'priority',
+            width: 90,
+            render: (priority: number) => <Tag>{priority ?? 0}</Tag>,
           },
           {
             title: '命中次数',
@@ -129,7 +149,7 @@ export default function FAQTable() {
                 <FAQEditModal mode="edit" record={record}>
                   <Button type="link" size="small" icon={<EditOutlined />} />
                 </FAQEditModal>
-                <Popconfirm title="确定删除？" onConfirm={() => handleDelete(record.id)}>
+                <Popconfirm title="确定删除？" onConfirm={() => void handleDelete(record.id)}>
                   <Button type="link" size="small" danger icon={<DeleteOutlined />} />
                 </Popconfirm>
               </Space>

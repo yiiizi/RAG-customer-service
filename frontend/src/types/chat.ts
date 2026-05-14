@@ -7,6 +7,7 @@ export interface SourceItem {
 
 export interface ChatMessage {
   id: string;
+  message_id?: number;
   role: 'user' | 'assistant';
   content: string;
   sources?: SourceItem[];
@@ -23,8 +24,22 @@ export interface Conversation {
   updatedAt: string;
 }
 
+export interface Message {
+  id: number;
+  conversation_id: number;
+  role: 'user' | 'assistant';
+  content: string;
+  sources?: string | null;
+  intent?: string | null;
+  latency_ms?: number | null;
+  created_at: string;
+}
+
 export interface ChatRequest {
   query: string;
+  conversation_id?: number;
+  kb_only?: boolean;
+  web_search?: boolean;
 }
 
 export interface ChatResponse {
@@ -32,4 +47,6 @@ export interface ChatResponse {
   intent: string;
   sources: SourceItem[];
   latency_ms: number;
+  conversation_id?: number;
+  message_id?: number;
 }

@@ -12,6 +12,7 @@ The scorer can operate in two modes:
 from __future__ import annotations
 
 import logging
+import re
 from typing import Optional
 
 import numpy as np
@@ -29,8 +30,23 @@ _corpus_tokenized: list[list[str]] = []
 
 
 def _tokenize(text: str) -> list[str]:
-    """Simple whitespace tokenizer; replace with jieba for Chinese."""
-    return text.lower().split()
+    """Tokenize mixed Chinese/English text for BM25."""
+    value = text.lower().strip()
+    if not value:
+        return []
+    try:
+        import jieba  # type: ignore
+
+        tokens = [tok.strip() for tok in jieba.lcut(value) if tok.strip()]
+        if tokens:
+            return tokens
+    except Exception:
+        pass
+
+    chinese_chars = re.findall(r"[\u4e00-\u9fff]", value)
+    words = re.findall(r"[a-z0-9]+", value)
+    bigrams = [a + b for a, b in zip(chinese_chars, chinese_chars[1:])]
+    return words + chinese_chars + bigrams
 
 
 def build_corpus(documents: list[dict]) -> None:

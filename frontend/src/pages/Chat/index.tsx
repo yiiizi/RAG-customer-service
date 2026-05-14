@@ -1,19 +1,11 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { useChatStore } from '@/stores/useChatStore';
 import ChatWindow from './ChatWindow';
 import ChatInput from './ChatInput';
 
 export default function ChatPage() {
-  const { activeId, newConversation, deleteLastAssistant, conversations } = useChatStore();
-  const initRef = useRef(false);
+  const { activeId, deleteLastAssistant, conversations } = useChatStore();
   const sendRef = useRef<((text: string) => void) | null>(null);
-
-  useEffect(() => {
-    if (!initRef.current && !activeId) {
-      initRef.current = true;
-      newConversation();
-    }
-  }, [activeId, newConversation]);
 
   const handleQuickSend = useCallback((text: string) => {
     if (sendRef.current) sendRef.current(text);

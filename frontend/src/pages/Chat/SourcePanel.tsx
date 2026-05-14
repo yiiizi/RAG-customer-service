@@ -1,137 +1,176 @@
-import { List, Tag, Typography } from 'antd';
-import { GlobalOutlined, DatabaseOutlined, FileTextOutlined } from '@ant-design/icons';
-import { useChatStore } from '@/stores/useChatStore';
-import { formatPercent } from '@/utils/format';
-
-const BOX_MAX_HEIGHT = 200;
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Descriptions, Modal, Space, Tag, Typography } from 'antd';
+import { EyeOutlined, MessageOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { mockProducts, type Product } from '@/mock/products';
 
 export default function SourcePanel() {
-  const { conversations, activeId } = useChatStore();
-  const conv = conversations.find((c) => c.id === activeId);
-
-  const lastAssistant = conv?.messages.filter((m) => m.role === 'assistant').at(-1);
-  const sources = lastAssistant?.sources ?? [];
-  const hasAnswer = !!(lastAssistant?.content && lastAssistant.content.trim());
-  const intent = lastAssistant?.intent;
-
-  // Separate web sources from KB sources
-  const webSources = sources.filter((s) => s.source && (s.source.startsWith('http') || s.source === '互联网' || s.source === 'Tavily'));
-  const kbSources = sources.filter((s) => !webSources.includes(s));
-
-  // Determine the empty state message
-  let emptyHint = '检索来源将在这里显示';
-  let emptyIcon = <FileTextOutlined style={{ fontSize: 32, color: 'var(--text-muted)', marginBottom: 8 }} />;
-  if (hasAnswer) {
-    if (intent === 'faq') {
-      emptyHint = '回答来自高频问答缓存';
-    } else if (intent === 'chat') {
-      emptyHint = '回答来自 AI 对话';
-    } else if (intent === 'order_query' || intent === 'logistics_track') {
-      emptyHint = '回答来自订单/物流查询';
-    } else if (intent === '联网搜索') {
-      emptyHint = '网络搜索结果已整合在回答中';
-    } else {
-      emptyHint = '知识库中未找到相关信息';
-    }
-  }
-
-  if (sources.length === 0) {
-    return (
-      <div style={{
-        width: 310, flexShrink: 0,
-        borderLeft: '1px solid var(--border-subtle)',
-        background: 'var(--sidebar-panel-bg)',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        padding: 24, gap: 8,
-      }}>
-        {emptyIcon}
-        <Typography.Text style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
-          {emptyHint}
-        </Typography.Text>
-      </div>
-    );
-  }
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
 
   return (
     <div style={{
-      width: 310, flexShrink: 0,
+      width: 330,
+      flexShrink: 0,
       borderLeft: '1px solid var(--border-subtle)',
       background: 'var(--sidebar-panel-bg)',
-      overflow: 'auto', padding: 16,
+      padding: 14,
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      gap: 12,
     }}>
-      {/* Web search sources */}
-      {webSources.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-            <GlobalOutlined style={{ fontSize: 13, color: '#ffa940' }} />
-            <Typography.Text strong style={{ fontSize: 12, color: '#ffa940' }}>
-              网络搜索结果
-            </Typography.Text>
-            <Tag color="orange" style={{ fontSize: 10, marginLeft: 'auto' }}>
-              {webSources.length} 条
-            </Tag>
-          </div>
-          {webSources.map((item, idx) => (
-            <div key={idx} style={{ marginBottom: 8 }}>
-              <div style={{
-                fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.7,
-                whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-                border: '1px solid rgba(255, 169, 64, 0.2)', borderRadius: 6,
-                padding: '6px 10px', background: 'rgba(255, 169, 64, 0.04)',
-                maxHeight: BOX_MAX_HEIGHT, overflow: 'auto',
-              }}>
-                {item.text}
-              </div>
-              {item.source && item.source !== '互联网' && (
-                <Typography.Text style={{ fontSize: 10, display: 'block', marginTop: 2, color: 'var(--text-muted)' }}>
-                  来源: {item.source}
-                </Typography.Text>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        paddingBottom: 8,
+        borderBottom: '1px solid var(--border-subtle)',
+      }}>
+        <ShoppingOutlined style={{ fontSize: 15, color: 'var(--accent)' }} />
+        <Typography.Text strong style={{ fontSize: 14, color: 'var(--text-primary)' }}>
+          推荐产品
+        </Typography.Text>
+      </div>
 
-      {/* KB sources */}
-      {kbSources.length > 0 && (
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-            <DatabaseOutlined style={{ fontSize: 13, color: 'var(--accent)' }} />
-            <Typography.Text strong style={{ fontSize: 12, color: 'var(--accent)' }}>
-              知识库检索结果
-            </Typography.Text>
-            <Tag color="cyan" style={{ fontSize: 10, marginLeft: 'auto' }}>
-              {kbSources.length} 条
-            </Tag>
-          </div>
-          {kbSources.map((item, idx) => (
-            <div key={idx} style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                <Typography.Text strong style={{ fontSize: 11, color: 'var(--text-primary)' }}>
-                  来源 {idx + 1}
-                </Typography.Text>
-                <Tag color="cyan" style={{ fontSize: 10, marginLeft: 'auto' }}>
-                  {formatPercent(item.score)}
-                </Tag>
-              </div>
-              <div style={{
-                maxHeight: BOX_MAX_HEIGHT, overflow: 'auto',
-                fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.7,
-                whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-                border: '1px solid var(--border-subtle)', borderRadius: 6,
-                padding: '6px 10px', background: 'var(--surface-raised)',
-              }}>
-                {item.text}
-              </div>
-              {item.source && (
-                <Typography.Text style={{ fontSize: 10, display: 'block', marginTop: 2, color: 'var(--text-muted)' }}>
-                  来自: {item.source}
-                </Typography.Text>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      <div style={{
+        flex: 1,
+        minHeight: 0,
+        display: 'grid',
+        gridTemplateRows: `repeat(${mockProducts.length}, minmax(0, 1fr))`,
+        gap: 10,
+      }}>
+        {mockProducts.map((product) => (
+          <ProductCard key={product.id} product={product} onViewDetail={setDetailProduct} />
+        ))}
+      </div>
+
+      <ProductDetailModal product={detailProduct} onClose={() => setDetailProduct(null)} />
     </div>
+  );
+}
+
+function ProductCard({
+  product,
+  onViewDetail,
+}: {
+  product: Product;
+  onViewDetail: (product: Product) => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
+
+  const askProduct = () => {
+    navigate('/chat');
+    window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('rag:quick-send', {
+        detail: `我想了解${product.name}，商品ID：${product.productId}，请介绍一下价格、优惠、库存、规格和售后政策。`,
+      }));
+    }, 80);
+  };
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        minHeight: 0,
+        border: '1px solid var(--border-subtle)',
+        borderRadius: 8,
+        padding: '10px 12px',
+        background: hovered ? 'var(--bg-hover)' : 'var(--surface-raised)',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 6,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+        <div style={{ minWidth: 0 }}>
+          <Typography.Text strong style={{ fontSize: 13, color: 'var(--text-primary)' }} ellipsis>
+            {product.name}
+          </Typography.Text>
+          <div style={{ marginTop: 3 }}>
+            <Tag color="blue" style={{ fontSize: 10 }}>{product.grade}</Tag>
+            <Tag color="red" style={{ fontSize: 10 }}>{product.price}</Tag>
+          </div>
+        </div>
+        <Space size={4} style={{ flexShrink: 0 }}>
+          <Button
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => onViewDetail(product)}
+            style={{ height: 24, width: 28, padding: 0 }}
+          />
+          <Button
+            type="primary"
+            size="small"
+            icon={<MessageOutlined />}
+            onClick={askProduct}
+            style={{ height: 24, padding: '0 8px' }}
+          >
+            咨询
+          </Button>
+        </Space>
+      </div>
+
+      <Typography.Paragraph
+        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.45, margin: 0 }}
+        ellipsis={{ rows: 2 }}
+      >
+        {product.description}
+      </Typography.Paragraph>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '52px 1fr', gap: '3px 6px', fontSize: 11, color: 'var(--text-muted)' }}>
+        <span>库存</span><span>{product.stock}</span>
+        <span>规格</span><span>{product.specs}</span>
+        <span>发货</span><span>{product.shipping}</span>
+        <span>售后</span><span>{product.service}</span>
+      </div>
+    </div>
+  );
+}
+
+function ProductDetailModal({ product, onClose }: { product: Product | null; onClose: () => void }) {
+  const navigate = useNavigate();
+
+  const askProduct = () => {
+    if (!product) return;
+    onClose();
+    navigate('/chat');
+    window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('rag:quick-send', {
+        detail: `我想了解${product.name}，商品ID：${product.productId}，请介绍一下价格、优惠、库存、规格和售后政策。`,
+      }));
+    }, 80);
+  };
+
+  return (
+    <Modal
+      open={!!product}
+      title={product?.name}
+      onCancel={onClose}
+      footer={[
+        <Button key="close" onClick={onClose}>关闭</Button>,
+        <Button key="ask" type="primary" icon={<MessageOutlined />} onClick={askProduct}>咨询该商品</Button>,
+      ]}
+      width={620}
+      destroyOnClose
+    >
+      {product && (
+        <Descriptions column={1} bordered size="small">
+          <Descriptions.Item label="商品ID">{product.productId}</Descriptions.Item>
+          <Descriptions.Item label="SKU">{product.skuId}</Descriptions.Item>
+          <Descriptions.Item label="价格">{product.price} <Typography.Text type="secondary">原价 {product.originalPrice}</Typography.Text></Descriptions.Item>
+          <Descriptions.Item label="优惠">{product.promo}</Descriptions.Item>
+          <Descriptions.Item label="库存">{product.stock}</Descriptions.Item>
+          <Descriptions.Item label="规格">{product.specs}</Descriptions.Item>
+          <Descriptions.Item label="配送">{product.shipping}</Descriptions.Item>
+          <Descriptions.Item label="保修">{product.service}</Descriptions.Item>
+          <Descriptions.Item label="退换货">{product.returnPolicy}</Descriptions.Item>
+          <Descriptions.Item label="标签">{product.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}</Descriptions.Item>
+          <Descriptions.Item label="推荐理由">{product.reason}</Descriptions.Item>
+        </Descriptions>
+      )}
+    </Modal>
   );
 }

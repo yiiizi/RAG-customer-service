@@ -1,57 +1,109 @@
 /* ============================================================
-   NEURAL COMMAND CENTER — Global Styles (Dark + Light)
+   RAG INTELLIGENT ASSISTANT — Global Styles (Dark + Light)
+   Brand: #6C63FF (Violet Blue) + #FF6584 (Coral Pink)
    ============================================================ */
 
 /* ── Dark theme (default) ──────────────────────────────────── */
-:root, [data-theme="dark"] {
-  --bg-deep: #060b14;
-  --bg-panel: #0d1321;
-  --bg-card: rgba(15, 23, 42, 0.85);
-  --bg-hover: rgba(0, 212, 255, 0.06);
-  --border-subtle: rgba(0, 212, 255, 0.12);
-  --border-glow: rgba(0, 212, 255, 0.3);
-  --accent: #00d4ff;
-  --accent-dim: #0098b3;
-  --text-primary: #e8edf2;
-  --text-secondary: #8896a8;
-  --text-muted: #556270;
-  --green: #00ff88;
-  --amber: #ffb300;
-  --red: #ff4472;
-  --purple: #7c3aed;
-  --surface-raised: rgba(8, 13, 24, 0.8);
-  --input-bg: rgba(8, 13, 24, 0.8);
-  --sidebar-bg: #0d1321;
-  --sidebar-panel-bg: #0d1321;
-  --content-bg: radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
-               radial-gradient(ellipse at 80% 20%, rgba(124, 58, 237, 0.03) 0%, transparent 50%),
-               #060b14;
-  --accent-glow: 0 0 12px rgba(0, 212, 255, 0.3);
+::root, [data-theme="dark"] {
+  /* Brand */
+  --accent: #6C63FF;
+  --accent-dim: #5A52E0;
+  --accent-secondary: #FF6584;
+
+  /* Surfaces */
+  --bg-deep: #0D0D1A;
+  --bg-panel: #1A1A2E;
+  --bg-card: #1A1A2E;
+  --bg-hover: rgba(108, 99, 255, 0.15);
+  --input-bg: #12122A;
+
+  /* Borders */
+  --border-subtle: #3A3A5A;
+  --border-glow: rgba(108, 99, 255, 0.4);
+
+  /* Text */
+  --text-primary: #E8E8F0;
+  --text-secondary: #8888A0;
+  --text-muted: #5C5C78;
+
+  /* Semantic */
+  --green: #4ADE80;
+  --amber: #FBBF24;
+  --red: #F87171;
+  --purple: #A78BFA;
+
+  /* Misc */
+  --surface-raised: rgba(26, 26, 46, 0.95);
+  --sidebar-bg: #1A1A2E;
+  --sidebar-panel-bg: #12122A;
+  --content-bg: #0D0D1A;
+  --accent-glow: 0 0 12px rgba(108, 99, 255, 0.3);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #6C63FF, #FF6584);
+  --gradient-brand-subtle: linear-gradient(135deg, rgba(108, 99, 255, 0.18), rgba(255, 101, 132, 0.06));
+
+  /* Selection */
+  --selection-bg: rgba(108, 99, 255, 0.35);
+  --selection-fg: #fff;
+
+  /* Input focus */
+  --focus-ring: 0 0 0 2px rgba(108, 99, 255, 0.25);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+
+  /* Markdown code block */
+  --code-bg: #12122A;
+  --code-border: #2A2A4A;
 }
 
 /* ── Light theme ───────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg-deep: #f5f7fa;
-  --bg-panel: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.92);
-  --bg-hover: rgba(22, 119, 255, 0.04);
-  --border-subtle: rgba(0, 0, 0, 0.08);
-  --border-glow: rgba(22, 119, 255, 0.25);
-  --accent: #1677ff;
-  --accent-dim: #0958d9;
-  --text-primary: #1a1a1a;
-  --text-secondary: #666;
-  --text-muted: #999;
-  --green: #52c41a;
-  --amber: #fa8c16;
-  --red: #ff4d4f;
-  --purple: #722ed1;
-  --surface-raised: #ffffff;
-  --input-bg: #ffffff;
-  --sidebar-bg: #fafafa;
-  --sidebar-panel-bg: #fafafa;
-  --content-bg: #f5f7fa;
-  --accent-glow: 0 0 12px rgba(22, 119, 255, 0.15);
+  --accent: #6C63FF;
+  --accent-dim: #5A52E0;
+  --accent-secondary: #FF6584;
+
+  --bg-deep: #F8F9FF;
+  --bg-panel: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: rgba(108, 99, 255, 0.08);
+  --input-bg: #F0F1FF;
+
+  --border-subtle: #E0E0F0;
+  --border-glow: rgba(108, 99, 255, 0.3);
+
+  --text-primary: #1A1A2E;
+  --text-secondary: #8888A0;
+  --text-muted: #A0A0B8;
+
+  --green: #22C55E;
+  --amber: #F59E0B;
+  --red: #EF4444;
+  --purple: #8B5CF6;
+
+  --surface-raised: #FFFFFF;
+  --sidebar-bg: #F0F1FF;
+  --sidebar-panel-bg: #F0F1FF;
+  --content-bg: #F8F9FF;
+  --accent-glow: 0 0 12px rgba(108, 99, 255, 0.15);
+
+  --gradient-brand: linear-gradient(135deg, #6C63FF, #FF6584);
+  --gradient-brand-subtle: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(255, 101, 132, 0.04));
+
+  --selection-bg: rgba(108, 99, 255, 0.2);
+  --selection-fg: #1A1A2E;
+
+  --focus-ring: 0 0 0 2px rgba(108, 99, 255, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+  --code-bg: #F0F1FF;
+  --code-border: #E0E0F0;
 }
 
 /* ── Reset ─────────────────────────────────────────────────── */
@@ -66,7 +118,7 @@ html, body, #root {
   height: 100%;
   background: var(--bg-deep);
   color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
   transition: background 0.3s, color 0.3s;
 }
@@ -94,13 +146,8 @@ html, body, #root {
 /* ── Selection ─────────────────────────────────────────────── */
 
 ::selection {
-  background: rgba(0, 212, 255, 0.35);
-  color: #fff;
-}
-
-[data-theme="light"] ::selection {
-  background: rgba(22, 119, 255, 0.2);
-  color: #1a1a1a;
+  background: var(--selection-bg);
+  color: var(--selection-fg);
 }
 
 /* ── Markdown ──────────────────────────────────────────────── */
@@ -108,17 +155,31 @@ html, body, #root {
 .markdown-body {
   color: var(--text-primary);
   line-height: 1.8;
+  font-size: 14px;
 }
 
 .markdown-body pre {
-  border-radius: 8px !important;
-  border: 1px solid var(--border-subtle) !important;
-  background: var(--bg-deep) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--code-border) !important;
+  background: var(--code-bg) !important;
+  position: relative;
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  font-size: 0.9em;
 }
 
 .markdown-body code {
   font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
   font-size: 0.9em;
+}
+
+.markdown-body :not(pre) > code {
+  background: var(--bg-hover);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .markdown-body table { width: 100%; border-collapse: collapse; }
@@ -130,15 +191,20 @@ html, body, #root {
 }
 
 .markdown-body th {
-  background: rgba(0, 212, 255, 0.08);
+  background: var(--bg-hover);
   color: var(--accent);
+  font-weight: 600;
 }
 
-[data-theme="light"] .markdown-body th {
-  background: rgba(22, 119, 255, 0.06);
+.markdown-body a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: text-decoration 0.2s;
 }
 
-.markdown-body a { color: var(--accent); }
+.markdown-body a:hover {
+  text-decoration: underline;
+}
 
 .markdown-body blockquote {
   border-left: 3px solid var(--accent);
@@ -156,18 +222,14 @@ html, body, #root {
 .ant-card {
   background: var(--bg-card) !important;
   border: 1px solid var(--border-subtle) !important;
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   backdrop-filter: blur(12px);
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .ant-card:hover {
   border-color: var(--border-glow) !important;
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.06), inset 0 0 20px rgba(0, 212, 255, 0.02);
-}
-
-[data-theme="light"] .ant-card:hover {
-  box-shadow: 0 0 20px rgba(22, 119, 255, 0.08), inset 0 0 20px rgba(22, 119, 255, 0.01);
+  box-shadow: var(--shadow-md);
 }
 
 .ant-card-head {
@@ -210,11 +272,7 @@ html, body, #root {
 
 .ant-input:focus, .ant-input-affix-wrapper:focus, .ant-input-affix-wrapper-focused {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15) !important;
-}
-
-[data-theme="light"] .ant-input:focus {
-  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12) !important;
+  box-shadow: var(--focus-ring) !important;
 }
 
 .ant-input::placeholder, .ant-input-affix-wrapper input::placeholder { color: var(--text-muted) !important; }
@@ -230,7 +288,7 @@ html, body, #root {
 
 .ant-select-focused .ant-select-selector {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15) !important;
+  box-shadow: var(--focus-ring) !important;
 }
 
 /* ── Modal / Drawer ────────────────────────────────────────── */
@@ -238,6 +296,7 @@ html, body, #root {
 .ant-modal-content, .ant-drawer-content {
   background: var(--bg-panel) !important;
   border: 1px solid var(--border-subtle) !important;
+  border-radius: 16px !important;
 }
 
 .ant-modal-header, .ant-drawer-header {
@@ -252,22 +311,16 @@ html, body, #root {
 /* ── Button ────────────────────────────────────────────────── */
 
 .ant-btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dim)) !important;
+  background: var(--gradient-brand) !important;
   border: none !important;
   box-shadow: var(--accent-glow);
-  transition: box-shadow 0.3s, transform 0.15s;
+  transition: box-shadow 0.3s, transform 0.15s, filter 0.2s;
 }
 
 .ant-btn-primary:hover {
   transform: translateY(-1px);
-}
-
-[data-theme="dark"] .ant-btn-primary:hover {
-  box-shadow: 0 0 24px rgba(0, 212, 255, 0.35) !important;
-}
-
-[data-theme="light"] .ant-btn-primary:hover {
-  box-shadow: 0 0 20px rgba(22, 119, 255, 0.25) !important;
+  filter: brightness(1.1);
+  box-shadow: 0 0 24px rgba(108, 99, 255, 0.35) !important;
 }
 
 .ant-btn-default {
@@ -305,12 +358,8 @@ html, body, #root {
 .ant-menu-dark .ant-menu-item:hover { background: var(--bg-hover) !important; }
 
 .ant-menu-dark .ant-menu-item-selected {
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.18), rgba(0, 212, 255, 0.06)) !important;
+  background: var(--gradient-brand-subtle) !important;
   border-left: 3px solid var(--accent);
-}
-
-[data-theme="light"] .ant-menu-dark .ant-menu-item-selected {
-  background: linear-gradient(135deg, rgba(22, 119, 255, 0.12), rgba(22, 119, 255, 0.04)) !important;
 }
 
 /* ── Tabs ──────────────────────────────────────────────────── */
@@ -336,7 +385,7 @@ html, body, #root {
 
 /* ── Misc ──────────────────────────────────────────────────── */
 
-.ant-tag { border-radius: 4px; font-weight: 500; }
+.ant-tag { border-radius: 6px; font-weight: 500; }
 .ant-progress-text { color: var(--text-secondary) !important; }
 .ant-slider-track { background: var(--accent) !important; }
 .ant-slider-handle { border-color: var(--accent) !important; }
@@ -354,7 +403,7 @@ html, body, #root {
 .ant-upload-drag {
   background: var(--bg-card) !important;
   border: 1px dashed var(--border-subtle) !important;
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   transition: border-color 0.3s, background 0.3s;
 }
 
@@ -368,7 +417,7 @@ html, body, #root {
 /* ── Page heading ──────────────────────────────────────────── */
 
 .page-heading {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 24px;
@@ -382,7 +431,7 @@ html, body, #root {
   height: 3px;
   margin-top: 8px;
   border-radius: 2px;
-  background: linear-gradient(90deg, var(--accent), transparent);
+  background: var(--gradient-brand);
 }
 
 /* ── Animations ────────────────────────────────────────────── */
@@ -392,14 +441,34 @@ html, body, #root {
   50% { opacity: 0.4; }
 }
 
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 4px var(--accent), 0 0 8px rgba(0, 212, 255, 0.2); }
-  50% { box-shadow: 0 0 12px var(--accent), 0 0 24px rgba(0, 212, 255, 0.4); }
+  0%, 100% { box-shadow: 0 0 4px var(--accent), 0 0 8px rgba(108, 99, 255, 0.2); }
+  50% { box-shadow: 0 0 12px var(--accent), 0 0 24px rgba(108, 99, 255, 0.4); }
 }
 
 @keyframes thinking-bounce {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
   40% { transform: translateY(-6px); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .thinking-dot {
@@ -422,7 +491,7 @@ html, body, #root {
   font: inherit;
   height: 32px;
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
   display: inline-flex;
   align-items: center;
@@ -430,19 +499,32 @@ html, body, #root {
   cursor: pointer;
   color: var(--text-secondary);
   background: transparent;
-  transition: all 0.2s;
+  transition: all 0.25s;
   white-space: nowrap;
   vertical-align: middle;
+  position: relative;
 }
 
 .nav-btn:hover {
-  background: var(--bg-hover);
   color: var(--accent);
+  background: var(--bg-hover);
 }
 
 .nav-btn.active {
   color: var(--accent);
   background: var(--bg-hover);
+}
+
+.nav-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
 }
 
 /* ── Conversation list items ─────────────────────────────── */
@@ -466,7 +548,7 @@ html, body, #root {
   inset: 0;
   border-radius: 10px;
   opacity: 0;
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.04), transparent);
+  background: var(--gradient-brand-subtle);
   transition: opacity 0.25s;
   pointer-events: none;
 }
@@ -492,7 +574,6 @@ html, body, #root {
 .conv-item.active {
   background: var(--bg-hover) !important;
   border-left: 3px solid var(--accent);
-  box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.04);
 }
 
 .conv-item.active::before {
@@ -533,6 +614,15 @@ html, body, #root {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.conv-item:hover .conv-delete {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.conv-delete:hover {
+  color: var(--red) !important;
+}
+
 /* ── Message action buttons ──────────────────────────────── */
 
 .msg-action-btn {
@@ -542,7 +632,7 @@ html, body, #root {
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 11px;
   color: var(--text-muted);
   cursor: pointer;
@@ -552,4 +642,482 @@ html, body, #root {
 .msg-action-btn:hover {
   color: var(--accent);
   background: var(--bg-hover);
+}
+
+/* ── Chat message animations ────────────────────────────── */
+
+.msg-bubble-enter {
+  animation: slideUp 0.3s ease forwards;
+}
+
+/* ── Login page decorations ─────────────────────────────── */
+
+.login-deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.login-deco-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(108, 99, 255, 0.15) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ── Glassmorphism card ────────────────────────────────── */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .glass-card {
+  background: rgba(26, 26, 46, 0.92);
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* prefers-color-scheme 回退：在 JS 未加载或 data-theme 未设置时也能正确显示 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .glass-card {
+    background: rgba(26, 26, 46, 0.92);
+    border: 1px solid rgba(108, 99, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ── Underline-style inputs (login/register) ───────────── */
+
+/*
+  Structure for Input with prefix:
+    .ant-input-affix-wrapper > .ant-input-prefix + .ant-input
+  Structure for Input.Password:
+    .ant-input-password > .ant-input-affix-wrapper > .ant-input-prefix + .ant-input + .ant-input-suffix
+
+  Rule: ONLY the OUTERMOST container gets border-bottom.
+  The inner .ant-input inside an affix-wrapper must have NO border at all.
+*/
+
+/* ── Outer containers: only these get the underline ── */
+.underline-input .ant-input-affix-wrapper,
+.underline-input .ant-input-password {
+  border: none !important;
+  border-bottom: 2px solid #D0D0E0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: border-color 0.3s;
+  padding-left: 0 !important;
+  border-color: transparent !important;
+  border-bottom-color: #D0D0E0 !important;
+}
+
+/* ── Standalone .ant-input (no affix wrapper, e.g. verification code input) ── */
+.underline-input > .ant-input,
+.underline-input .ant-form-control-input .ant-input:not(.ant-input-affix-wrapper .ant-input) {
+  border: none !important;
+  border-bottom: 2px solid #D0D0E0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: border-color 0.3s;
+  padding-left: 0 !important;
+  border-color: transparent !important;
+  border-bottom-color: #D0D0E0 !important;
+}
+
+/* Dark mode: brighter border for visibility */
+[data-theme="dark"] .underline-input .ant-input-affix-wrapper,
+[data-theme="dark"] .underline-input .ant-input-password {
+  border-bottom-color: #4A4A6A !important;
+}
+
+[data-theme="dark"] .underline-input > .ant-input,
+[data-theme="dark"] .underline-input .ant-form-control-input .ant-input:not(.ant-input-affix-wrapper .ant-input) {
+  border-bottom-color: #4A4A6A !important;
+}
+
+/* prefers-color-scheme 回退 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .underline-input .ant-input-affix-wrapper,
+  :root:not([data-theme]) .underline-input .ant-input-password {
+    border-bottom-color: #4A4A6A !important;
+  }
+  :root:not([data-theme]) .underline-input > .ant-input,
+  :root:not([data-theme]) .underline-input .ant-form-control-input .ant-input:not(.ant-input-affix-wrapper .ant-input) {
+    border-bottom-color: #4A4A6A !important;
+  }
+}
+
+/* ── Inner .ant-input inside affix-wrapper: NO border at all ── */
+.underline-input .ant-input-affix-wrapper .ant-input,
+.underline-input .ant-input-password .ant-input {
+  border: none !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  color: #1A1A2E !important;
+  -webkit-text-fill-color: #1A1A2E !important;
+}
+
+[data-theme="dark"] .underline-input .ant-input-affix-wrapper .ant-input,
+[data-theme="dark"] .underline-input .ant-input-password .ant-input {
+  color: #E8E8F0 !important;
+  -webkit-text-fill-color: #E8E8F0 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .underline-input .ant-input-affix-wrapper .ant-input,
+  :root:not([data-theme]) .underline-input .ant-input-password .ant-input {
+    color: #E8E8F0 !important;
+    -webkit-text-fill-color: #E8E8F0 !important;
+  }
+}
+
+/* ── Placeholder ── */
+.underline-input .ant-input::placeholder,
+.underline-input .ant-input-affix-wrapper .ant-input::placeholder,
+.underline-input .ant-input-password .ant-input::placeholder {
+  color: #A0A0B8 !important;
+  -webkit-text-fill-color: #A0A0B8 !important;
+}
+
+[data-theme="dark"] .underline-input .ant-input::placeholder,
+[data-theme="dark"] .underline-input .ant-input-affix-wrapper .ant-input::placeholder,
+[data-theme="dark"] .underline-input .ant-input-password .ant-input::placeholder {
+  color: rgba(155, 143, 208, 0.7) !important;
+  -webkit-text-fill-color: rgba(155, 143, 208, 0.7) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .underline-input .ant-input::placeholder,
+  :root:not([data-theme]) .underline-input .ant-input-affix-wrapper .ant-input::placeholder,
+  :root:not([data-theme]) .underline-input .ant-input-password .ant-input::placeholder {
+    color: rgba(155, 143, 208, 0.7) !important;
+    -webkit-text-fill-color: rgba(155, 143, 208, 0.7) !important;
+  }
+}
+
+/* ── Dark-mode: force affix-wrapper / password wrapper transparent ── */
+[data-theme="dark"] .underline-input .ant-input-affix-wrapper,
+[data-theme="dark"] .underline-input .ant-input-password {
+  background: transparent !important;
+  border-color: transparent !important;
+  border-bottom-color: #4A4A6A !important;
+  box-shadow: none !important;
+}
+
+/* ── Prefix / Suffix icon colors ── */
+.underline-input .ant-input-prefix,
+.underline-input .ant-input-affix-wrapper .ant-input-prefix,
+.underline-input .ant-input-password .ant-input-prefix {
+  color: #8888A0 !important;
+}
+
+.underline-input .ant-input-suffix,
+.underline-input .ant-input-affix-wrapper .ant-input-suffix {
+  color: #8888A0 !important;
+}
+
+[data-theme="dark"] .underline-input .ant-input-prefix,
+[data-theme="dark"] .underline-input .ant-input-affix-wrapper .ant-input-prefix,
+[data-theme="dark"] .underline-input .ant-input-password .ant-input-prefix {
+  color: rgba(155, 143, 208, 0.7) !important;
+}
+
+[data-theme="dark"] .underline-input .ant-input-suffix,
+[data-theme="dark"] .underline-input .ant-input-affix-wrapper .ant-input-suffix {
+  color: rgba(155, 143, 208, 0.7) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .underline-input .ant-input-prefix,
+  :root:not([data-theme]) .underline-input .ant-input-affix-wrapper .ant-input-prefix,
+  :root:not([data-theme]) .underline-input .ant-input-password .ant-input-prefix {
+    color: rgba(155, 143, 208, 0.7) !important;
+  }
+  :root:not([data-theme]) .underline-input .ant-input-suffix,
+  :root:not([data-theme]) .underline-input .ant-input-affix-wrapper .ant-input-suffix {
+    color: rgba(155, 143, 208, 0.7) !important;
+  }
+}
+
+/* ── Focus state: only bottom border color changes ── */
+.underline-input .ant-input:focus,
+.underline-input .ant-input-affix-wrapper-focused,
+.underline-input .ant-input-affix-wrapper:focus-within,
+.underline-input .ant-input-password:focus-within {
+  border-bottom-color: var(--accent) !important;
+  box-shadow: none !important;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .login-deco-left {
+    display: none !important;
+  }
+  .login-layout {
+    padding: 24px !important;
+  }
+}
+
+/* ── Code block language tag ────────────────────────────── */
+
+.code-block-wrapper {
+  position: relative;
+}
+
+.code-block-lang {
+  position: absolute;
+  top: 6px;
+  left: 10px;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Capsule toggle ─────────────────────────────────────── */
+
+.capsule-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: '0 10px';
+  height: 28px;
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.25s;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.capsule-toggle.active {
+  background: var(--gradient-brand-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Brand Logo (pure CSS) ──────────────────────────────── */
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--gradient-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--accent-glow);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.brand-logo::after {
+  content: '';
+  width: 16px;
+  height: 12px;
+  border: 2.5px solid var(--text-primary);
+  border-radius: 2px 2px 6px 6px;
+  position: relative;
+}
+
+.brand-logo::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  bottom: 8px;
+  right: 8px;
+}
+
+/* ── Sidebar transition ─────────────────────────────────── */
+
+.sidebar-container {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Fade-in animation for content ──────────────────────── */
+
+.fade-in {
+  animation: fadeIn 0.2s ease forwards;
+}
+
+/* ── Admin layout accents ───────────────────────────────── */
+
+.admin-sider-logo {
+  background: var(--gradient-brand);
+}
+
+/* ── Status indicator ───────────────────────────────────── */
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: breathe 2s infinite ease-in-out;
+}
+
+/* ── Connection error ───────────────────────────────────── */
+
+.connection-error-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: breathe 1.5s infinite ease-in-out;
+}
+
+/* ── Dark-mode comprehensive text color overrides ──────── */
+/* Ensures ALL antd text elements are visible on dark bg   */
+
+[data-theme="dark"] .ant-card-body,
+[data-theme="dark"] .ant-card-body p,
+[data-theme="dark"] .ant-card-body li,
+[data-theme="dark"] .ant-card-body span,
+[data-theme="dark"] .ant-descriptions-item-content,
+[data-theme="dark"] .ant-descriptions-item-label,
+[data-theme="dark"] .ant-form-item-label > label,
+[data-theme="dark"] .ant-typography,
+[data-theme="dark"] .ant-statistic-title,
+[data-theme="dark"] .ant-statistic-content,
+[data-theme="dark"] .ant-list-item-meta-title,
+[data-theme="dark"] .ant-list-item-meta-description,
+[data-theme="dark"] .ant-checkbox-wrapper,
+[data-theme="dark"] .ant-radio-wrapper,
+[data-theme="dark"] .ant-tree-treenode,
+[data-theme="dark"] .ant-breadcrumb-link,
+[data-theme="dark"] .ant-pagination-item a,
+[data-theme="dark"] .ant-pagination-prev .ant-pagination-item-link,
+[data-theme="dark"] .ant-pagination-next .ant-pagination-item-link {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .ant-card-extra,
+[data-theme="dark"] .ant-list-item-action > li,
+[data-theme="dark"] .ant-form-item-explain,
+[data-theme="dark"] .ant-form-item-extra,
+[data-theme="dark"] .ant-typography-secondary {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .ant-pagination-disabled a,
+[data-theme="dark"] .ant-pagination-disabled .ant-pagination-item-link {
+  color: var(--text-muted) !important;
+}
+
+/* ── Admin layout Sider dark override ──────────────────── */
+/* The admin sider uses theme="dark" but we want our brand colors */
+
+.ant-layout-sider-dark .ant-menu-item,
+.ant-layout-sider-dark .ant-menu-submenu-title {
+  color: var(--text-secondary) !important;
+}
+
+.ant-layout-sider-dark .ant-menu-item-selected,
+.ant-layout-sider-dark .ant-menu-submenu-selected {
+  color: var(--accent) !important;
+}
+
+.ant-layout-sider-dark .ant-menu-item:hover,
+.ant-layout-sider-dark .ant-menu-submenu-title:hover {
+  color: var(--accent) !important;
+}
+
+/* ── prefers-color-scheme fallback for dark mode ──────── */
+/* When JS hasn't loaded yet and data-theme is not set,   */
+/* system dark mode users should still see correct colors */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    /* Same as dark theme variables */
+    --accent: #6C63FF;
+    --accent-dim: #5A52E0;
+    --accent-secondary: #FF6584;
+    --bg-deep: #0D0D1A;
+    --bg-panel: #1A1A2E;
+    --bg-card: #1A1A2E;
+    --bg-hover: rgba(108, 99, 255, 0.15);
+    --input-bg: #12122A;
+    --border-subtle: #3A3A5A;
+    --border-glow: rgba(108, 99, 255, 0.4);
+    --text-primary: #E8E8F0;
+    --text-secondary: #8888A0;
+    --text-muted: #5C5C78;
+    --green: #4ADE80;
+    --amber: #FBBF24;
+    --red: #F87171;
+    --purple: #A78BFA;
+    --surface-raised: rgba(26, 26, 46, 0.95);
+    --sidebar-bg: #1A1A2E;
+    --sidebar-panel-bg: #12122A;
+    --content-bg: #0D0D1A;
+    --accent-glow: 0 0 12px rgba(108, 99, 255, 0.3);
+    --gradient-brand: linear-gradient(135deg, #6C63FF, #FF6584);
+    --gradient-brand-subtle: linear-gradient(135deg, rgba(108, 99, 255, 0.18), rgba(255, 101, 132, 0.06));
+    --selection-bg: rgba(108, 99, 255, 0.35);
+    --selection-fg: #fff;
+    --focus-ring: 0 0 0 2px rgba(108, 99, 255, 0.25);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+    --code-bg: #12122A;
+    --code-border: #2A2A4A;
+  }
+
+  :root:not([data-theme]) .ant-card-body,
+  :root:not([data-theme]) .ant-card-body p,
+  :root:not([data-theme]) .ant-card-body li,
+  :root:not([data-theme]) .ant-card-body span,
+  :root:not([data-theme]) .ant-descriptions-item-content,
+  :root:not([data-theme]) .ant-descriptions-item-label,
+  :root:not([data-theme]) .ant-form-item-label > label,
+  :root:not([data-theme]) .ant-typography,
+  :root:not([data-theme]) .ant-statistic-title,
+  :root:not([data-theme]) .ant-statistic-content,
+  :root:not([data-theme]) .ant-list-item-meta-title,
+  :root:not([data-theme]) .ant-list-item-meta-description,
+  :root:not([data-theme]) .ant-checkbox-wrapper,
+  :root:not([data-theme]) .ant-radio-wrapper,
+  :root:not([data-theme]) .ant-tree-treenode,
+  :root:not([data-theme]) .ant-breadcrumb-link,
+  :root:not([data-theme]) .ant-pagination-item a,
+  :root:not([data-theme]) .ant-pagination-prev .ant-pagination-item-link,
+  :root:not([data-theme]) .ant-pagination-next .ant-pagination-item-link {
+    color: var(--text-primary) !important;
+  }
+
+  :root:not([data-theme]) .ant-card-extra,
+  :root:not([data-theme]) .ant-list-item-action > li,
+  :root:not([data-theme]) .ant-form-item-explain,
+  :root:not([data-theme]) .ant-form-item-extra,
+  :root:not([data-theme]) .ant-typography-secondary {
+    color: var(--text-secondary) !important;
+  }
+
+  :root:not([data-theme]) .ant-pagination-disabled a,
+  :root:not([data-theme]) .ant-pagination-disabled .ant-pagination-item-link {
+    color: var(--text-muted) !important;
+  }
 }

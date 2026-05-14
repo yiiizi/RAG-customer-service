@@ -12,9 +12,10 @@ from typing import Optional, Sequence
 
 from sqlalchemy import func, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import selectinload
 
-from config.settings import settings
-from mysql_module.models import Base, BM25Score, FAQPair, QALog
+from backend.config.settings import settings
+from backend.mysql_module.models import Base, BM25Score, FAQPair, QALog
 
 # ── Engine & session factory ────────────────────────────────────────
 engine = create_async_engine(
@@ -73,7 +74,7 @@ async def faq_get_by_question(session: AsyncSession, question: str) -> Optional[
     if len(q_norm) < 2:
         return None
 
-    stmt = select(FAQPair)
+    stmt = select(FAQPair).options(selectinload(FAQPair.semantic_index))
     result = await session.execute(stmt)
     all_faqs = result.scalars().all()
 
@@ -81,6 +82,9 @@ async def faq_get_by_question(session: AsyncSession, question: str) -> Optional[
     best_score = 0
 
     for faq in all_faqs:
+        ext = faq.semantic_index
+        if ext and ext.status != "active":
+            continue
         fq_norm = _normalize(faq.question)
         if not fq_norm:
             continue
@@ -112,7 +116,7 @@ async def faq_search(
     limit: int = 20,
 ) -> Sequence[FAQPair]:
     """Search FAQ entries by keyword (LIKE) and optional category filter."""
-    stmt = select(FAQPair)
+    stmt = select(FAQPair).options(selectinload(FAQPair.semantic_index))
     if keyword:
         stmt = stmt.where(FAQPair.question.contains(keyword))
     if category:
@@ -165,7 +169,7 @@ async def faq_delete(session: AsyncSession, faq_id: str) -> bool:
 
 async def faq_get_hot(session: AsyncSession, top_n: int = 10) -> Sequence[FAQPair]:
     """Return the top-N FAQ entries ordered by frequency."""
-    stmt = select(FAQPair).order_by(FAQPair.frequency.desc()).limit(top_n)
+    stmt = select(FAQPair).options(selectinload(FAQPair.semantic_index)).order_by(FAQPair.frequency.desc()).limit(top_n)
     result = await session.execute(stmt)
     return result.scalars().all()
 
@@ -244,9 +248,10 @@ async def qalog_insert(
     return log
 
 
-async def qalog_stats(session: AsyncSession, days: int = 30) -> dict:
+async def qalog_stats(session: AsyncSession, days: int = 30, since: datetime | None = None) -> dict:
     """Aggregate dashboard stats for the last N days."""
-    since = datetime.utcnow() - timedelta(days=days)
+    if since is None:
+        since = datetime.utcnow() - timedelta(days=days)
 
     # total
     total_stmt = select(func.count()).select_from(QALog).where(QALog.created_at >= since)

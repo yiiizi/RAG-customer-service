@@ -10,9 +10,9 @@ Intent → Strategy mapping:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Awaitable, Callable, Optional
+from typing import Any, Callable
 
-Strategy = Callable[[str, Optional[dict[str, Any]]], Awaitable[dict[str, Any]]]
+Strategy = Callable[[str, dict[str, Any]], Any]
 
 
 @dataclass
@@ -38,7 +38,7 @@ class StrategySelector:
         self,
         intent: str,
         query: str,
-        extra: Optional[dict[str, Any]] = None,
+        extra: dict[str, Any] | None = None,
     ) -> StrategyResult:
         """Route query to the appropriate strategy."""
         fn = self._strategies.get(intent)
